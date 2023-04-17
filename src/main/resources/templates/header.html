@@ -1,0 +1,58 @@
+<html xmlns:th="http://www.thymeleaf.org">
+<body>
+<div th:fragment="content">
+  <nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <div class="container-fluid">
+      <a class="navbar-brand" href="/main">My REST API Shop</a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+              aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav">
+          <li class="nav-item active">
+            <a class="nav-link" href="/main">Home</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="/shop">My Shop</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" href="#">Orders</a>
+          </li>
+        </ul>
+        <ul class="navbar-nav ms-auto">
+          <a class="nav-link" href="/cart">Cart (<span th:text="${currentUser.cart.productsListInCart.size()}"></span>)</a>
+          <li class="nav-item">
+            <p class="nav-link me-3 mb-0">Welcome, <span th:text="${currentUser.getUsername()}"></span></p>
+          </li>
+          <li class="nav-item" th:if="${#lists.contains(currentUser.roles.![name], 'ROLE_ADMIN')}">
+            <form method="get" action="/admin/panel">
+              <button class="btn btn-outline-primary" type="submit">Admin Panel</button>
+            </form>
+          </li>
+          <li class="nav-item">
+            <form method="post" action="/perform_logout">
+              <button class="btn btn-outline-primary" type="submit">Logout</button>
+            </form>
+          </li>
+
+        </ul>
+        <br>
+      </div>
+    </div>
+  </nav>
+
+</div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+

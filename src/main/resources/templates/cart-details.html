@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" rel="stylesheet">
+    <title>My Page</title>
+    <style>
+        /* Other styles remain the same */
+
+
+
+        .product-item {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            border: 1px solid #ddd;
+            padding: 10px;
+            height: 100px;
+            width: 100%;
+            transition: background-color 0.5s ease;
+        }
+
+        .product-info {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        .quantity-input {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .my-products {
+            text-align: center;
+            font-family: Arial, sans-serif;
+            font-size: 24px;
+            font-weight: bold;
+            color: #4d4d4d;
+            margin-top: 20px;
+        }
+
+        /* Media query for smaller screens */
+        @media screen and (max-width: 767px) {
+            .product-item {
+                flex-direction: column;
+                height: auto;
+            }
+
+            .product-info {
+                align-items: center;
+            }
+
+            .btn.btn-primary.add-shop-button {
+                margin-top: 10px;
+                margin-bottom: 10px;
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+<div th:replace="~{header :: content}"></div>
+
+<div>
+
+    <h5 class="my-products">My cart</h5>
+    <div class="mb-3">
+        <div class="container mt-5">
+            <div class="main-container">
+                <div class="product-container">
+                    <div th:each="product : ${currentUser.getCart().getProductsListInCart()}" class="product-item">
+                        <a style="text-decoration: none;color: inherit; width: 50%;" th:href="@{/viewProduct(productId=${product.id})}" th:data-id="${product.id}">
+                            <div class="product-info">
+                                <span class="product-name" th:text="${product.name}" />
+                                <span class="product-price">
+                                <span th:text="${product.price}" />
+                                <span class="product-currency">&#8381;</span>
+                            </span>
+                                <span class="product-organization" th:text="${product.getOrganization().name}" />
+                            </div>
+                        </a>
+                        <div>
+                            <form method="post" action="/deleteFromCart">
+                                <input type="hidden" name="productId" th:value="${product.id}" />
+                                <button type="submit" class="btn btn-primary add-shop-button">Remove</button>
+                            </form>
+                        </div>
+                        <div class="quantity-input">
+                            <input type="number" min="1" step="1" value="1">
+                        </div>
+                    </div>
+                </div>
+                <div class="sidebar-container">
+                    <div class="cart-info">
+                        Total cost: <span th:text="${currentUser.getCart().getCostPurchase()}" class="cart-value"></span><span class="product-currency">&#8381;</span>
+                    </div>
+                    <!-- Add other cart info here -->
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script crossorigin="anonymous"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

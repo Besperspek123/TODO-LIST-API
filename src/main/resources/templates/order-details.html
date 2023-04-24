@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" rel="stylesheet">
+    <title>My Page</title>
+    <style>
+        .shop-block {
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            height: 100px;
+            text-align: center;
+            transition: background-color 0.5s ease;
+            cursor: pointer;
+        }
+
+        .shop-block:hover {
+            background-color: #f5f5f5;
+            transform: scale(1.1);
+        }
+
+        .add-shop-button {
+            display: block;
+            margin: 0 auto;
+            width: 200px;
+            text-align: center;
+        }
+
+        .mb-3 {
+            margin-top: 20px;
+        }
+
+        .product-info {
+            margin-top: 50px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-size: 2rem;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+
+        .product-description {
+            font-size: 1.2rem;
+            font-style: italic;
+            margin-bottom: 20px;
+        }
+
+        .product-characteristics {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .product-keywords {
+            font-size: 1.2rem;
+            margin-bottom: 20px;
+        }
+
+        .product-price {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #c00;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+
+<body>
+<div th:replace="~{header :: content}"></div>
+
+<div class="product-info">
+    Order number:
+    <h1 class="product-name" th:text="${order.id}"></h1>
+    Products:
+    <ul class="product-characteristics">
+        <li th:each="cartProduct :${order.getProductList()}">
+            <a th:href="@{/viewProduct(productId=${cartProduct.getProduct().id})}">
+                <span th:text="${cartProduct.getProduct().name}" />
+            </a>
+            <span> x </span>
+            <span th:text="${cartProduct.getQuantity()}" />
+        </li>
+    </ul>
+    Order price:
+    <h1 class="product-price" th:text="${order.price}"></h1>
+</div>
+
+<div class="mb-3"></div>
+
+<script crossorigin="anonymous"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

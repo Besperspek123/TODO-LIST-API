@@ -6,17 +6,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.PermissionForSaveThisProductDeniedException;
+import spring.rest.shop.springrestshop.repository.ProductRepository;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -32,6 +30,9 @@ public class ProductController {
     ShopService shopService;
     @Autowired
     ProductService productService;
+
+    @Autowired
+    ProductRepository productRepository;
 
 
         @GetMapping("/addProduct")
@@ -74,10 +75,7 @@ public class ProductController {
             Product product = productService.getProductDetails(productId);
             int shopId = product.getOrganization().getId();
             User currentUser = userService.findUserByUsername(authentication.getName());
-            if(product.getOrganization().getOwner() == currentUser
-                    || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
                 productService.deleteProduct(currentUser,product);
-            }
             return "redirect:/viewShop?shopId=" + shopId;
         }
 
@@ -88,5 +86,13 @@ public class ProductController {
             model.addAttribute("currentUser",currentUser);
         model.addAttribute(productService.getProductDetails(productId));
         return "product-details";
+        }
+        @GetMapping("/searchProducts")
+        public String searchProducts(@RequestParam("searchQuery") String searchQuery,Model model,Authentication authentication){
+            List<Product> productList = productService.findProductByNameContaining(searchQuery);
+            User currentUser = userService.findUserByUsername(authentication.getName());
+            model.addAttribute("productList",productList);
+            model.addAttribute("currentUser",currentUser);
+            return "main";
         }
 }

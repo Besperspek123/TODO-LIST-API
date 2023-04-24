@@ -6,11 +6,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.entity.Cart;
-import spring.rest.shop.springrestshop.entity.Product;
+import spring.rest.shop.springrestshop.entity.CartProduct;
 import spring.rest.shop.springrestshop.entity.User;
-import spring.rest.shop.springrestshop.exception.ProductAlreadyHaveInCartException;
+import spring.rest.shop.springrestshop.repository.CartProductRepository;
 import spring.rest.shop.springrestshop.repository.CartRepository;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 @Service
@@ -20,49 +22,55 @@ public class CartService  {
     private final UserService userService;
     private final ProductService productService;
     private final CartRepository cartRepository;
+    private final CartProductRepository cartProductRepository;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void saveCart(Cart cart){
         int pricePurchase = 0;
-        for (Product product:cart.getProductsListInCart()) {
-            pricePurchase += product.getPrice();
+        for (CartProduct cartProduct:cart.getCartProducts()) {
+            pricePurchase += cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
         }
         cart.setCostPurchase(pricePurchase);
         cartRepository.save(cart);
     }
 
-    public void addProductToCart(User buyer, Product product){
+    public void addProductToCart(User currentUser, CartProduct cartProduct){
 
-        Cart cartCurrentUser = buyer.getCart();
-        List<Product> listForPurchase = cartCurrentUser.getProductsListInCart();
-        try {
-            if(listForPurchase.contains(product)){
-                throw new ProductAlreadyHaveInCartException("This product already have in Cart");
+        }
+
+        public void calculateTotalCost(Cart cart){
+        int totalCost = 0;
+            for (CartProduct cartProduct:cart.getCartProducts()
+                 ) {
+                totalCost += (int) cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
             }
-            listForPurchase.add(product);
+            cart.setCostPurchase(totalCost);
+            System.out.println("В корзину сохранятеся сумма " + totalCost);
+            cartRepository.save(cart);
         }
-        catch (Exception e){
-            System.out.println(e.getMessage());
+
+
+    public void deleteProductInCart(User currentUser, int productId) {
+        Cart currentCart = currentUser.getCart();
+        List<CartProduct> currentProductsInCart = currentCart.getCartProducts();
+        List<CartProduct> newProductsListCart = new ArrayList<>();
+
+        for (CartProduct cartProduct: currentProductsInCart
+             ) {
+            if(cartProduct.getProduct().getId() != productId){
+                newProductsListCart.add(cartProduct);
+            }
+            else cartProduct.setCart(null);
+            cartProductRepository.save(cartProduct);
         }
 
+        cartRepository.save(currentCart);
 
-        cartCurrentUser.setProductsListInCart(listForPurchase);
-        buyer.setCart(cartCurrentUser);
+        currentCart.setCartProducts(newProductsListCart);
+        calculateTotalCost(currentCart);
 
-        saveCart(cartCurrentUser);
-    }
-
-    public void deleteProductInCart (User owner,Product product){
-        Cart currentCart = owner.getCart();
-        List<Product> currentProductsInCart = currentCart.getProductsListInCart();
-        if (currentProductsInCart.contains(product)){
-            int idForDelete = currentProductsInCart.indexOf(product);
-            currentProductsInCart.remove(idForDelete);
-        }
-        currentCart.setProductsListInCart(currentProductsInCart);
-        saveCart(currentCart);
     }
 
 }

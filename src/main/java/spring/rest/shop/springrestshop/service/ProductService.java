@@ -2,11 +2,6 @@ package spring.rest.shop.springrestshop.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.repository.*;
@@ -17,7 +12,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ProductService  {
+public class ProductService {
 
     private final ProductRepository productRepository;
     private final ShopRepository shopRepository;
@@ -63,10 +58,16 @@ public class ProductService  {
         shopRepository.getOrganizationById(shopId).getProductList().add(product);
     }
 
-    public void deleteProduct(User user,Product product){
-        if(product.getOrganization().getOwner() == user){
+    public void deleteProduct(User currentUser,Product product){
+        if(product.getOrganization().getOwner() == currentUser
+                || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
             productRepository.deleteById(product.getId());
         }
+    }
+    public List<Product> findProductByNameContaining(String name){
+
+        return productRepository.findAllByNameContaining(name);
+
     }
 
 }

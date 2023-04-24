@@ -46,6 +46,9 @@ public class User implements UserDetails {
     @Column(name = "balance")
     private long Balance;
 
+    @OneToMany(mappedBy = "customer")
+    private List<Order> orderList = new ArrayList<>();
+
     @Override
     public String getUsername(){
         return username;
@@ -74,5 +77,19 @@ public class User implements UserDetails {
     @Override
     public boolean isEnabled() {
         return activity;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(id, username, email);
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof User)) return false;
+        User user = (User) obj;
+        return Objects.equals(id, user.id) &&
+                Objects.equals(username, user.username) &&
+                Objects.equals(email, user.email);
     }
 }

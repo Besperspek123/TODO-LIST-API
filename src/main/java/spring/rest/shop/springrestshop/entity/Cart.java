@@ -5,6 +5,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Data
@@ -18,15 +19,29 @@ public class Cart {
     @OneToOne
     private User buyer;
 
-    @ManyToMany(cascade = CascadeType.ALL)
-    @JoinTable(name = "cart_product",
-            joinColumns = {@JoinColumn(name = "cart_id")},
-            inverseJoinColumns = {@JoinColumn(name = "product_id")})
-    private List<Product> productsListInCart = new ArrayList<>();
+    @OneToMany(mappedBy = "cart")
+    private List<CartProduct> cartProducts = new ArrayList<>();
+
+
 
     @Column(name = "costForPurchase")
     private long costPurchase = 0;
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
+    }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (!(obj instanceof Cart)) {
+            return false;
+        }
+        Cart other = (Cart) obj;
+        return Objects.equals(id, other.id);
+    }
 
 }

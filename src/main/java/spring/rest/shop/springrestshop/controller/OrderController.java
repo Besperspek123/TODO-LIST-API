@@ -9,20 +9,20 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.entity.Cart;
-import spring.rest.shop.springrestshop.entity.CartProduct;
+import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
-import spring.rest.shop.springrestshop.service.CartProductService;
-import spring.rest.shop.springrestshop.service.CartService;
-import spring.rest.shop.springrestshop.service.ProductService;
-import spring.rest.shop.springrestshop.service.UserService;
+import spring.rest.shop.springrestshop.service.*;
 
 @Controller
-public class CartController {
+public class OrderController {
     @Autowired
     private UserService userService;
     @Autowired
     private CartService cartService;
+
+    @Autowired
+    private OrderService orderService;
 
     @Autowired
     private ProductService productService;
@@ -30,38 +30,33 @@ public class CartController {
     @Autowired
     private CartProductService cartProductService;
 
-    @PostMapping("/addToCart")
-    public String addProductToCart(@RequestParam("productId") int productId, Model model, Authentication authentication, RedirectAttributes redirectAttributes){
+    @PostMapping("/createOrder")
+    public String createOrder(Authentication authentication,RedirectAttributes redirectAttributes){
         User currentUser = userService.findUserByUsername(authentication.getName());
-        Product productForAddToCart = productService.getProductDetails(productId);
+        Cart currentCart = currentUser.getCart();
+        if(currentCart.getCartProducts().size() != 0){
+            orderService.createOrder(currentUser,currentCart);
+        }
 
-        model.addAttribute("currentUser",currentUser);
-
-        cartProductService.saveCartProduct(currentUser,productForAddToCart);
-
-
-
-
-
-        return "redirect:/main";
-    }
-
-    @PostMapping("/deleteFromCart")
-    public String deleteFromCart(@RequestParam("productId") int productId,Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        cartService.deleteProductInCart(currentUser, productId);
-
-
-
-
+        else redirectAttributes.addAttribute("orderIsEmpty", "true");
         return "redirect:/cart";
     }
 
-
-    @GetMapping("/cart")
-    public String cartDetails(Model model,Authentication authentication){
+    @GetMapping("/orders")
+    public String ordersPage(Authentication authentication, Model model){
         User currentUser = userService.findUserByUsername(authentication.getName());
         model.addAttribute("currentUser",currentUser);
-        return "cart-details";
+        model.addAttribute("ordersList",currentUser.getOrderList());
+
+        return "orders";
+    }
+
+    @GetMapping("/viewOrder")
+    public String viewOrder(@RequestParam(name = "orderId") long orderId,Authentication authentication,Model model){
+        User currentUser = userService.findUserByUsername(authentication.getName());
+        Order order = orderService.getOrderDetails(currentUser,orderId);
+        model.addAttribute("currentUser",currentUser);
+        model.addAttribute("order",order);
+        return "order-details";
     }
 }

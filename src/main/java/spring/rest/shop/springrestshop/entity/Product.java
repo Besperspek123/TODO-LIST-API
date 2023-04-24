@@ -32,9 +32,6 @@ public class Product {
     @Column(name = "sale")
     private int Sale;
 
-    @ManyToMany(mappedBy = "productsListInCart")
-    private List<Cart> carts = new ArrayList<>();
-
     @OneToMany(cascade = CascadeType.REMOVE)
     @CollectionTable(name = "product_review",joinColumns = @JoinColumn(name = "product_id"))
     private List<Review> reviewsList;

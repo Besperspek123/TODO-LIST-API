@@ -10,14 +10,10 @@ import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import spring.rest.shop.springrestshop.entity.Organization;
-import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
-
-import java.util.List;
 
 @Controller
 @Slf4j
@@ -52,7 +48,7 @@ public class UserController {
     public String pageAfterSuccessLogin(Model model, Authentication authentication){
         User currentUser = userService.findUserByUsername(authentication.getName());
         model.addAttribute("currentUser",currentUser);
-        model.addAttribute("productList",productService.getListProducts());
+        model.addAttribute("productList", productService.getListProducts());
         return "main";
     }
 

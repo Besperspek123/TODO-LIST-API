@@ -74,13 +74,12 @@
 <body>
 <div th:replace="~{header :: content}"></div>
 
-<div class="error-popup" style="display: none;">
-    <div class="alert alert-success" role="alert">
-        Product already have in cart!
-    </div>
-</div>
 
 <div class="container mt-5">
+    <form class="d-flex mb-3" th:action="@{/searchProducts}" method="get">
+        <input class="form-control me-2" type="search" name="searchQuery" placeholder="Search" aria-label="Search">
+        <button class="btn btn-outline-success" type="submit">Search</button>
+    </form>
     <span th:if="${productList.size()==0}" >NOT PRODUCTS</span>
     <div class="product-container">
         <a style="text-decoration: none;color: inherit" th:each="product : ${productList}" th:href="@{/viewProduct(productId=${product.id})}" th:data-id="${product.id}" class="product-item">
@@ -102,20 +101,6 @@
         integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
         src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
 
-<script>
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.get('errorAddToCart')) {
-        showErrorAddProductToCartPopup();
-    }
-
-    function showErrorAddProductToCartPopup() {
-        const popup = document.querySelector('.error-popup');
-        popup.style.display = 'block';
-        setTimeout(() => {
-            popup.style.display = 'none';
-        }, 3000);
-    }
-</script>
 </body>
 
 </html>

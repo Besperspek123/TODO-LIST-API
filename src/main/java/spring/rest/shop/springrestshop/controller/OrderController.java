@@ -10,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.Order;
-import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.service.*;
 
@@ -48,7 +47,7 @@ public class OrderController {
         model.addAttribute("currentUser",currentUser);
         model.addAttribute("ordersList",currentUser.getOrderList());
 
-        return "orders";
+        return "order/orders-page";
     }
 
     @GetMapping("/viewOrder")
@@ -57,6 +56,6 @@ public class OrderController {
         Order order = orderService.getOrderDetails(currentUser,orderId);
         model.addAttribute("currentUser",currentUser);
         model.addAttribute("order",order);
-        return "order-details";
+        return "order/details";
     }
 }

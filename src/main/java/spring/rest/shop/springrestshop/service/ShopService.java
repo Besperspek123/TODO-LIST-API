@@ -27,15 +27,30 @@ public class ShopService {
     }
 
     public void saveShop(Organization shop,User owner){
-        shop.setOwner(owner);
+        if(shop.getId()== 0){
+            shop.setOwner(owner);
+        }
+        else {
+            shop.setOwner(shopRepository.getOrganizationById(shop.getId()).getOwner());
+        }
+
+
         //need to change in false when be make admin mode
-        shop.setActivity(true);
+        shop.setActivity(false);
         shopRepository.save(shop);
 
     }
 
     public Organization getShopDetails(int id){
         return shopRepository.getOrganizationById(id);
+    }
+
+    public List<Organization> getAllShops(){
+        return shopRepository.getAllBy();
+    }
+
+    public List<Organization> getShopsByNameContaining(String string){
+        return shopRepository.getAllByNameContaining(string);
     }
 
     public void deleteShop(int id, User user) {
@@ -65,6 +80,11 @@ public class ShopService {
 
         shopRepository.deleteById((long) id);
     }
+
+    public List<Organization> getAllModerationShops(){
+        return shopRepository.getAllByActivityIsFalse();
+    }
+
 
 }
 

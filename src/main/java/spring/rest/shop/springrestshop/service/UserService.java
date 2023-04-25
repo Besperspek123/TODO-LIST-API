@@ -10,11 +10,11 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.exception.PermissionForBanAndUnbanUserDeniedException;
+import spring.rest.shop.springrestshop.exception.UserBannedException;
 import spring.rest.shop.springrestshop.repository.*;
 
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -27,7 +27,19 @@ public class UserService implements UserDetailsService {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByUsername(username);
+        User user = userRepository.findByUsername(username);
+//        if (user == null) {
+//            throw new UsernameNotFoundException("User not found");
+//        }
+//        if (!user.getActivity()) {
+//            throw new UserBannedException("User is banned"); // Исключение при неактивном пользователе
+//        }
+        return user;
+    }
+
+
+    public User getUserById(long id){
+       return userRepository.findById(id);
     }
 
     public List<User> getAllUsers(){
@@ -38,24 +50,68 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsername(username);
     }
 
+    public List<User> findUsersByUsernameContaining(String string){
+        return userRepository.findByUsernameContaining(string);
+    }
+
     public boolean saveUser(User user) {
-        if(userRepository.findByUsername(user.getUsername())==null){
-            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        if(userRepository.findByUsername(user.getUsername())==null
+                || userRepository.findByUsername(user.getUsername())!=null && user.getId() != null){
+            if(user.getPassword() != null){
+                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            }
             user.getRoles().add(Role.ROLE_USER);
-            user.setActivity(true);
+            if (user.getActivity() == null){
+                user.setActivity(true);
+            }
             if (user.getUsername().equals("admin")){
                 user.getRoles().add(Role.ROLE_ADMIN);
             }
-            Cart cart = new Cart();
-            cartRepository.save(cart); // сохраняем корзину
-            cart.setBuyer(user);
-            user.setCart(cart);
+            if(user.getCart() == null){
+                Cart cart = new Cart();
+                cartRepository.save(cart); // сохраняем корзину
+                cart.setBuyer(user);
+                user.setCart(cart);
+            }
+
+
             userRepository.save(user); // сохраняем пользователя
             log.info("Saving new User with username: {}", user.getUsername());
             return true;
         }
-        else return false;
+       return false;
+    }
+    public void banUser(User userForBan,User currentUser){
+        try {
+            if(currentUser.getRoles().contains(Role.ROLE_ADMIN)){
+                userForBan.setActivity(false);
+                userRepository.save(userForBan);
+            }
+            else throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
+        }
+        catch (PermissionForBanAndUnbanUserDeniedException e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
     }
 
+    public void unbanUser(User userForUnban,User currentUser){
+        try {
+            if(currentUser.getRoles().contains(Role.ROLE_ADMIN)){
+                userForUnban.setActivity(true);
+                userRepository.save(userForUnban);
+            }
+            else throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
+        }
+        catch (PermissionForBanAndUnbanUserDeniedException e){
+            e.printStackTrace();
+            System.out.println(e.getMessage());
+        }
+    }
+
+    public void addBalance(User user, int deposit) {
+        user.setBalance(user.getBalance() + deposit);
+        userRepository.save(user);
+    }
 }
 

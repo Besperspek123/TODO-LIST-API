@@ -8,8 +8,6 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import spring.rest.shop.springrestshop.entity.Cart;
-import spring.rest.shop.springrestshop.entity.CartProduct;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.service.CartProductService;
@@ -62,6 +60,6 @@ public class CartController {
     public String cartDetails(Model model,Authentication authentication){
         User currentUser = userService.findUserByUsername(authentication.getName());
         model.addAttribute("currentUser",currentUser);
-        return "cart-details";
+        return "cart/details";
     }
 }

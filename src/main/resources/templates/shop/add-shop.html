@@ -23,7 +23,9 @@
                     th:action="@{/addShop}"
             >
 
-                <input type="hidden" th:value="${shopForm.id}" id="id" name = "id">
+                <div >
+                    <input type="hidden" th:value="${shopForm.id}" id="id" name = "id">
+                </div>
 
                 <div class="mb-3">
                     <label class="form-label" for="name">Shop name</label>

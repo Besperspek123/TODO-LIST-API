@@ -11,6 +11,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.UserBannedException;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -29,13 +30,11 @@ public class UserController {
 
     @GetMapping("/login")
     public String loginPage(){
-        log.info("Вызван контроллер loginPage() Get Mapping");
         return "login";
     }
 
     @PostMapping("/login")
-    public String login() {
-        log.info("Вызван контроллер login() Post Mapping");
+    public String login(){
         return "redirect:/main";
     }
     @GetMapping("/registration")

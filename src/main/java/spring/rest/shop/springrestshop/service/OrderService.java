@@ -5,10 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import spring.rest.shop.springrestshop.entity.Cart;
-import spring.rest.shop.springrestshop.entity.CartProduct;
-import spring.rest.shop.springrestshop.entity.Order;
-import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.repository.CartProductRepository;
 import spring.rest.shop.springrestshop.repository.CartRepository;
 import spring.rest.shop.springrestshop.repository.OrderRepository;
@@ -54,11 +51,12 @@ public class OrderService {
     public Order getOrderDetails(User currentUser,long orderId){
 
         Order order = orderRepository.findById(orderId);
-        if(order.getCustomer() == currentUser){
+        if(order.getCustomer() == currentUser || currentUser.getRoles().contains(Role.ROLE_ADMIN)){
             return order;
         }
         return new Order();
     }
+
 
 }
 

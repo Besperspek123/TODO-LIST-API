@@ -41,7 +41,7 @@ public class ProductController {
             model.addAttribute("currentUser",currentUser);
             model.addAttribute("productForm",new Product());
             model.addAttribute("shopId",shopId);
-            return "add-product";
+            return "product/add-product";
         }
         @PostMapping("/addProduct")
         public String addProductForCurrentShop(@ModelAttribute("productForm") @Validated Product productForm,
@@ -67,7 +67,7 @@ public class ProductController {
             model.addAttribute("currentUser",currentUser);
             model.addAttribute("productForm", productService.getProductDetails(productId));
             model.addAttribute("shopId",shopId);
-            return "add-product";
+            return "product/add-product";
         }
 
         @PostMapping("/deleteProduct")
@@ -85,7 +85,7 @@ public class ProductController {
             User currentUser = userService.findUserByUsername(authentication.getName());
             model.addAttribute("currentUser",currentUser);
         model.addAttribute(productService.getProductDetails(productId));
-        return "product-details";
+        return "product/details";
         }
         @GetMapping("/searchProducts")
         public String searchProducts(@RequestParam("searchQuery") String searchQuery,Model model,Authentication authentication){

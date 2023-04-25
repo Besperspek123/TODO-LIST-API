@@ -42,30 +42,6 @@ public class SecurityConfig {
     @Autowired
     DataSource dataSource;
 
-//
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//        http
-//                .csrf()
-//                .disable()
-//                .authorizeHttpRequests((requests) -> requests
-//                        .requestMatchers( "/login/**","/registration/**").permitAll()
-//                        .requestMatchers("/admin/**").hasRole(Role.ROLE_ADMIN.toString())
-//                        .anyRequest().authenticated()
-//                )
-//                .formLogin()
-//                .loginPage("/login")
-//                .loginProcessingUrl("/login")
-//                .defaultSuccessUrl("/main", true)
-//                .permitAll()
-//                .and()
-//                .logout()
-//                .logoutUrl("/perform_logout").permitAll()
-//                .logoutSuccessUrl("/login");
-//
-//        return http.build();
-//
-//    }
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {

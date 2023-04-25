@@ -2,6 +2,7 @@ package spring.rest.shop.springrestshop.controller;
 
 
 import lombok.extern.slf4j.Slf4j;
+import org.aspectj.weaver.ast.Or;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -37,7 +38,7 @@ public class ShopController {
 
                 model.addAttribute("listShopForCurrentUser",shopListForCurrentUser);
 
-                return "shop";
+                return "shop/shop-page";
             }
 
         @GetMapping("/addShop")
@@ -45,17 +46,18 @@ public class ShopController {
         User currentUser = userService.findUserByUsername(authentication.getName());
             model.addAttribute("currentUser",currentUser);
             model.addAttribute("shopForm",new Organization());
-            return "addShop";
+            return "shop/add-shop";
         }
 
         @PostMapping("/addShop")
-    public String addShop(@ModelAttribute("shopForm") @Validated Organization shopForm, BindingResult bindingResult,
-                          Model model,Authentication authentication){
+    public String addShop(@ModelAttribute("shopForm") @Validated Organization shopForm,
+                          BindingResult bindingResult, Model model,Authentication authentication){
             if (bindingResult.hasErrors()) {
-                return "addShop";
+                return "shop/add-shop";
             }
-            User currentUser = userService.findUserByUsername(authentication.getName());
-            shopService.saveShop(shopForm,currentUser);
+               User currentUser = userService.findUserByUsername(authentication.getName());
+                shopService.saveShop(shopForm,currentUser);
+
 
             return "redirect:/shop";
         }
@@ -70,7 +72,7 @@ public class ShopController {
                         model.addAttribute("shopForm",currentShop);
             }
 
-                return "addShop";
+                return "shop/add-shop";
         }
         @PostMapping("/deleteShop")
         public String deleteShop(@RequestParam("shopId") int shopId,Model model,Authentication authentication)
@@ -90,7 +92,7 @@ public class ShopController {
             model.addAttribute("currentUser",currentUser);
             model.addAttribute("currentShop",shopService.getShopDetails(id));
             System.out.println(currentUser.getAuthorities().toString());
-            return "shop-details";
+            return "shop/details";
 
         }
 }

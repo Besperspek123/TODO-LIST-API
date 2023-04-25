@@ -108,6 +108,8 @@
 <div>
     <h1 class="store-header" th:text="${currentShop.name}">My Store</h1>
     <h4 style="text-align: center;font-style: italic" th:text="${currentShop.description}"></h4>
+    owner:
+    <h4 style="text-align: center;font-style: italic" th:text="${currentShop.getOwner().username}"></h4>
     <h5 class="my-products">Store products</h5>
     <div class="mb-3">
 

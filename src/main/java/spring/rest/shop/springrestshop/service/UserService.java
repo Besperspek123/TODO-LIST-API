@@ -36,6 +36,18 @@ public class UserService implements UserDetailsService {
 //        }
         return user;
     }
+    public boolean checkIfUserExistsByUsername(String username){
+        if(userRepository.findByUsername(username) == null){
+            return false;
+        }
+        return true;
+    }
+    public boolean checkIfUserExistsByEmail(String email){
+        if(userRepository.findByEmail(email) == null){
+            return false;
+        }
+        return true;
+    }
 
 
     public User getUserById(long id){
@@ -56,10 +68,12 @@ public class UserService implements UserDetailsService {
 
     public boolean saveUser(User user) {
         if(userRepository.findByUsername(user.getUsername())==null
+                && userRepository.findByEmail(user.getEmail())==null
                 || userRepository.findByUsername(user.getUsername())!=null && user.getId() != null){
             if(user.getPassword() != null){
                 user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             }
+
             user.getRoles().add(Role.ROLE_USER);
             if (user.getActivity() == null){
                 user.setActivity(true);
@@ -83,7 +97,7 @@ public class UserService implements UserDetailsService {
     }
     public void banUser(User userForBan,User currentUser){
         try {
-            if(currentUser.getRoles().contains(Role.ROLE_ADMIN)){
+            if(currentUser.getRoles().contains(Role.ROLE_ADMIN) && !userForBan.getRoles().contains(Role.ROLE_ADMIN)){
                 userForBan.setActivity(false);
                 userRepository.save(userForBan);
             }

@@ -79,8 +79,11 @@
     Name:
     <h1 class="product-name" th:text="${product.name}"></h1>
     Shop:
-    <a th:href="@{/viewShop(shopId=${product.getOrganization().id})}" class="product-name" th:text="${product.getOrganization().getName()}"></a>
+    <div th:if="${product.organization != null}">
+        <a th:href="@{/viewShop(shopId=${product.getOrganization().id})}" class="product-name" th:text="${product.getOrganization().getName()}"></a>
 
+    </div>
+    <span th:if="${product.organization == null}">Shop Deleted</span>
     Description:
     <h4 class="product-description" th:text="${product.description}"></h4>
     Keywords:
@@ -93,6 +96,8 @@
     </ul>
     Price:
     <h4 class="product-price" th:text="${product.price}">&#8381;</h4>
+    Amount in store:
+    <h4 class="product-price" th:text="${product.amountInStore}"></h4>
 </div>
 
 <div class="mb-3"></div>

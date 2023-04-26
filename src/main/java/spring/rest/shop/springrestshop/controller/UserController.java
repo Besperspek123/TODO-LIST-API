@@ -44,10 +44,13 @@ public class UserController {
         return "registration";
     }
     @GetMapping("/main")
-    public String pageAfterSuccessLogin(Model model, Authentication authentication){
+    public String pageAfterSuccessLogin(@RequestParam (name = "cartProductError",required = false)  String cartProductError, Model model, Authentication authentication){
         User currentUser = userService.findUserByUsername(authentication.getName());
         model.addAttribute("currentUser",currentUser);
-        model.addAttribute("productList", productService.getListProducts());
+        model.addAttribute("productList", productService.getListProductsWhereShopActivityTrue());
+        if(cartProductError!=null){
+            model.addAttribute("cartProductError",cartProductError);
+        }
         return "main";
     }
 
@@ -63,10 +66,17 @@ public class UserController {
             model.addAttribute("passwordError", "Пароли не совпадают");
             return "registration";
         }
-        if (!userService.saveUser(userForm)){
+        if (userService.checkIfUserExistsByUsername(userForm.getUsername())){
             model.addAttribute("usernameError", "Пользователь с таким именем уже существует");
             return "registration";
         }
+        if (userService.checkIfUserExistsByEmail(userForm.getEmail())){
+            model.addAttribute("emailError", "Пользователь с такой почтой уже существует");
+            return "registration";
+        }
+
+        userService.saveUser(userForm);
+
 
         redirectAttributes.addAttribute("success", "true");
         return "redirect:/login";

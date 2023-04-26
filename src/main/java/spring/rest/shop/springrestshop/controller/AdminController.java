@@ -76,7 +76,7 @@ public class AdminController {
         model.addAttribute("currentUser",currentUser);
         List<Organization> shops = shopService.getShopsByNameContaining(searchQuery);
         model.addAttribute("allShops",shops);
-        return "shop/shop-page";
+        return "admin/shops";
     }
     @PostMapping("/banUser")
     public String banUser(@RequestParam(name = "userId")long userId,Authentication authentication){
@@ -129,5 +129,46 @@ public class AdminController {
         List<Organization> allShops = shopService.getAllModerationShops();
         model.addAttribute("allShops",allShops);
         return "admin/moderation";
+    }
+    @GetMapping("/searchModerationShop")
+    public String searchModerationShop(@RequestParam(name = "searchQuery") String searchQuery,Model model,Authentication authentication){
+        User currentUser = userService.findUserByUsername(authentication.getName());
+        model.addAttribute("currentUser",currentUser);
+        List<Organization> shops = shopService.getAllModerationShopsByNameContaining(searchQuery);
+        model.addAttribute("allShops",shops);
+        return "admin/moderation";
+    }
+    @PostMapping("/approveShop")
+    public String approveShop(@RequestParam(name = "shopId") long shopId){
+        shopService.approveShop(shopId);
+
+        return "redirect:/admin/moderation";
+    }
+
+    @PostMapping("/disapproveAllShops")
+    public String disapproveAllShops(Authentication authentication){
+        shopService.disapproveAllShops(userService.findUserByUsername(authentication.getName()));
+        return "redirect:/admin/moderation";
+    }
+
+    @PostMapping("/approveAllShops")
+    public String approveAllShops(){
+        shopService.approveAllShops();
+        return "redirect:/admin/moderation";
+    }
+    @PostMapping("/deleteShop")
+    public String deleteShop(@RequestParam(name = "shopId")long shopId,Authentication authentication){
+        User currentUser = userService.findUserByUsername(authentication.getName());
+        shopService.deleteShop((int)shopId,currentUser);
+        return "redirect:/admin/shops";
+    }
+
+    @GetMapping("/viewShopsUser")
+    public String viewShopsUser(@RequestParam(name = "userId") long userId, Authentication authentication, Model model){
+        List<Organization> userShopList = shopService.getListActivityShopForCurrentUser(userService.getUserById(userId));
+        model.addAttribute("allShops",userShopList);
+                User currentUser = userService.findUserByUsername(authentication.getName());
+        model.addAttribute("currentUser",currentUser);
+        return "admin/shops";
     }
 }

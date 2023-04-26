@@ -24,6 +24,9 @@
                     <div th:if="${usernameError}">
                         <div class="alert alert-danger" th:text="${usernameError}"></div>
                     </div>
+                    <div th:if="${emailError}">
+                        <div class="alert alert-danger" th:text="${emailError}"></div>
+                    </div>
                     <label class="form-label" for="username">Username</label>
                     <input th:value="${userForm.username}" class="form-control" id="username" name="username" placeholder="Enter username"
                            type="text" required maxlength="20">

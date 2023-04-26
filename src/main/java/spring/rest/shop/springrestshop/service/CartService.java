@@ -73,5 +73,15 @@ public class CartService  {
 
     }
 
+    public void updateCartItem(Cart cart, long productId, long quantity) {
+        for (CartProduct cartProduct: cart.getCartProducts()
+             ) {
+            if(cartProduct.getProduct().getId() == productId){
+                cartProduct.setQuantity((int)quantity);
+                cartProductRepository.save(cartProduct);
+                calculateTotalCost(cart);
+            }
+        }
+    }
 }
 

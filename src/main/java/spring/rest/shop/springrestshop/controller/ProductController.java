@@ -48,7 +48,8 @@ public class ProductController {
         @RequestParam ("shopId") int shopId,Authentication authentication){
             User currentUser = userService.findUserByUsername(authentication.getName());
             if(productForm.getId() != 0){
-                if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
+                if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
+                        || currentUser == productService.getProductDetails((int)productForm.getId()).getOrganization().getOwner()){
                     productService.saveProduct(productForm, shopId);
                 }
                 else try {
@@ -89,7 +90,7 @@ public class ProductController {
         }
         @GetMapping("/searchProducts")
         public String searchProducts(@RequestParam("searchQuery") String searchQuery,Model model,Authentication authentication){
-            List<Product> productList = productService.findProductByNameContaining(searchQuery);
+            List<Product> productList = productService.findProductByNameContainingAndShopActivityTrue(searchQuery);
             User currentUser = userService.findUserByUsername(authentication.getName());
             model.addAttribute("productList",productList);
             model.addAttribute("currentUser",currentUser);

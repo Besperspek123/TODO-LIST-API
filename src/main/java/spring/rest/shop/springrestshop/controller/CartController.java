@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.service.CartProductService;
@@ -35,6 +36,16 @@ public class CartController {
 
         model.addAttribute("currentUser",currentUser);
 
+        if (productForAddToCart.getAmountInStore() == 0){
+            redirectAttributes.addAttribute("cartProductError","В магазине нет товара");
+            return "redirect:/main";
+        }
+        if(!cartProductService.checkAvailability(currentUser,productForAddToCart)){
+            redirectAttributes.addAttribute("cartProductError","Вы не можете добавить в корзину такое количество" +
+                    "товара, которого нет в магазине");
+                    return "redirect:/main";
+        }
+
         cartProductService.saveCartProduct(currentUser,productForAddToCart);
 
 
@@ -61,5 +72,12 @@ public class CartController {
         User currentUser = userService.findUserByUsername(authentication.getName());
         model.addAttribute("currentUser",currentUser);
         return "cart/details";
+    }
+
+    @PostMapping("/cart/update")
+    public String updateCart(@RequestParam(name = "productId") Integer productId,@RequestParam(name = "quantity") int quantity,Authentication authentication) {
+        Cart cart = userService.findUserByUsername(authentication.getName()).getCart();
+        cartService.updateCartItem(cart, productId, quantity);
+        return "redirect:/cart";
     }
 }

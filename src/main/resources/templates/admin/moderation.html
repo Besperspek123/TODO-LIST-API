@@ -91,13 +91,20 @@
 <body>
 <div th:replace="~{header :: content}"></div>
 <div th:replace="~{admin/header :: admin}"></div>
-<h1 style="text-align: center">SHOPS</h1>
+<h1 style="text-align: center">Moderation List</h1>
 <div class="container mt-5">
-    <form class="d-flex mb-3" th:action="@{/admin/searchShop}" method="get">
+    <form class="d-flex mb-3" th:action="@{/admin/searchModerationShop}" method="get">
         <input class="form-control me-2" type="search" name="searchQuery" placeholder="Search" aria-label="Search">
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
-    <span th:if="${allShops.size()==0}" >NOT SHOPS</span>
+
+    <form th:action="@{/admin/appr  oveAllShops}" method="post">
+        <button type="submit" class="btn btn-primary">Approve All</button>
+    </form>
+    <form th:action="@{/admin/disapproveAllShops}" method="post">
+        <button type="submit" class="btn btn-primary">Disapprove All</button>
+    </form>
+    <span style="text-align: center" th:if="${allShops.size()==0}" >NOT SHOPS FOR MODERATION</span>
     <div class="product-container">
         <a style="text-decoration: none;color: inherit" th:each="shop : ${allShops}" th:href="@{/admin/shopInfo(shopId=${shop.id})}" th:data-id="${shop.id}" class="product-item">
             <span class="product-name" th:text="${shop.name}" />
@@ -107,6 +114,14 @@
             <form th:action="@{/admin/shopInfo}" method="get">
                 <input type="hidden" name="shopId" th:value="${shop.id}" />
                 <button type="submit" class="btn btn-primary">Info</button>
+            </form>
+            <form th:action="@{/admin/approveShop}" method="post">
+                <input type="hidden" name="shopId" th:value="${shop.id}" />
+                <button type="submit" class="btn btn-primary">Approve</button>
+            </form>
+            <form th:action="@{/admin/disapproveShop}" method="post">
+                <input type="hidden" name="shopId" th:value="${shop.id}" />
+                <button type="submit" class="btn btn-primary">Disapprove</button>
             </form>
         </a>
     </div>

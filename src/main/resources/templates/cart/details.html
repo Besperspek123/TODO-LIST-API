@@ -93,7 +93,7 @@
                                 <span th:text="${cartProduct.getProduct().price}" />
                                 <span class="product-currency">&#8381;</span>
                             </span>
-                                <span class="product-organization" th:text="${cartProduct.getProduct().getOrganization().name}" />
+                                <span th:if="${cartProduct.getProduct().getOrganization() != null}" class="product-organization" th:text="${cartProduct.getProduct().getOrganization().name}" />
                             </div>
                         </a>
                         <div>
@@ -103,7 +103,8 @@
                             </form>
                         </div>
                         <div class="quantity-input">
-                            <input type="number" step="1" th:value="${cartProduct.getQuantity()}">
+                            <input type="number" step="1" th:value="${cartProduct.getQuantity()}"
+                                   th:attr="data-product-id=${cartProduct.getId()}">
                         </div>
                     </div>
                 </div>
@@ -139,6 +140,30 @@
             popup.style.display = 'none';
         }, 3000);
     }
+</script>
+<script th:inline="javascript">
+    $(document).ready(function() {
+        // обработчик события change для input-элемента с классом quantity-input
+        $('.quantity-input input').change(function() {
+            // получаем id товара и новое количество
+            var productId = $(this).data('product-id');
+            var newQuantity = $(this).val();
+
+            // отправляем AJAX-запрос на сервер, чтобы обновить количество товара в корзине
+            $.ajax({
+                type: 'POST',
+                url: '/cart/update',
+                data: {
+                    productId: productId,
+                    quantity: newQuantity
+                },
+                success: function(data) {
+                    // обновляем страницу корзины, чтобы отобразить новое количество товара
+                    window.location.reload();
+                }
+            });
+        });
+    });
 </script>
 </body>
 </html>

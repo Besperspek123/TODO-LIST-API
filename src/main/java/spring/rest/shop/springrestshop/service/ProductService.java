@@ -21,8 +21,18 @@ public class ProductService {
     private final CharacteristicRepository characteristicRepository;
 
 
-    public List<Product> getListProducts(){
-        return productRepository.getAllBy();
+    public List<Product> getListProductsWhereShopActivityTrue(){
+        List<Product> allProducts =productRepository.getAllBy();
+        List<Product> allProductWhereShopActivityTrue = new ArrayList<>();
+        for (Product product:allProducts
+             ) {
+            if(product.getOrganization() != null){
+                if (product.getOrganization().isActivity()){
+                    allProductWhereShopActivityTrue.add(product);
+                }
+            }
+        }
+        return allProductWhereShopActivityTrue;
     }
 
 
@@ -64,9 +74,20 @@ public class ProductService {
             productRepository.deleteById(product.getId());
         }
     }
-    public List<Product> findProductByNameContaining(String name){
+    public List<Product> findProductByNameContainingAndShopActivityTrue(String name){
 
-        return productRepository.findAllByNameContaining(name);
+        productRepository.findAllByNameContaining(name);
+        List<Product> allProductsByNameContaining =  productRepository.findAllByNameContaining(name);
+        List<Product> allProductByNameContainingAndWhereShopActivityTrue = new ArrayList<>();
+        for (Product product:allProductsByNameContaining
+        ) {
+            if(product.getOrganization()!=null){
+                if(product.getOrganization().isActivity()){
+                    allProductByNameContainingAndWhereShopActivityTrue.add(product);
+                }
+            }
+        }
+        return allProductByNameContainingAndWhereShopActivityTrue;
 
     }
 

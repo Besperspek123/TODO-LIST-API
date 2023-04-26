@@ -33,11 +33,12 @@ public class ShopController {
             public String pageMyShop(Model model,Authentication authentication){
                 User currentUser = userService.findUserByUsername(authentication.getName());
                 model.addAttribute("currentUser",currentUser);
-                List<Organization> shopListForCurrentUser = shopService.
-                        getListActivityShopForCurrentUser(userService.findUserByUsername(authentication.getName()));
+                List<Organization> listActiveShopForCurrentUser = shopService.
+                        getListActivityShopForCurrentUser(currentUser);
+                List<Organization> listModerationShopForCurrentUser = shopService.getListModerationShopForCurrentUser(currentUser);
 
-                model.addAttribute("listShopForCurrentUser",shopListForCurrentUser);
-
+                model.addAttribute("listActiveShopForCurrentUser",listActiveShopForCurrentUser);
+                model.addAttribute("listModerationShopForCurrentUser",listModerationShopForCurrentUser);
                 return "shop/shop-page";
             }
 

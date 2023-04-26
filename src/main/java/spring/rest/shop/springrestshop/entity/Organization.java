@@ -29,7 +29,7 @@ public class Organization {
     private boolean activity;
 
 
-    @OneToMany(mappedBy = "organization" ,cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "organization")
     private List<Product> productList;
 
 

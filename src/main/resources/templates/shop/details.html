@@ -76,7 +76,23 @@
         }
         .store-header {
             text-align: center;
-            font-size: 3rem;
+            font-size: 2rem;
+            font-weight: bold;
+            margin-top: 30px;
+            margin-bottom: 10px;
+        }
+
+        .store-description {
+            text-align: center;
+            font-size: 1rem;
+            font-style: italic;
+            margin-top: 10px;
+            margin-bottom: 10px;
+        }
+
+        .store-owner {
+            text-align: center;
+            font-size: 1.5rem;
             font-weight: bold;
             margin-top: 50px;
             margin-bottom: 30px;
@@ -99,6 +115,7 @@
             background-color: #c00;
             margin: 20px auto;
         }
+
     </style>
 </head>
 <body>
@@ -106,11 +123,10 @@
 <div th:replace="~{header :: content}"></div>
 
 <div>
-    <h1 class="store-header" th:text="${currentShop.name}">My Store</h1>
-    <h4 style="text-align: center;font-style: italic" th:text="${currentShop.description}"></h4>
-    owner:
-    <h4 style="text-align: center;font-style: italic" th:text="${currentShop.getOwner().username}"></h4>
-    <h5 class="my-products">Store products</h5>
+    <h1 class="store-header"><span>Shop name:</span> <span th:text="${currentShop.name}">My Store</span></h1>
+    <h4 class="store-description"><span>Shop description:</span> <span th:text="${currentShop.description}"></span></h4>
+    <h4 class="store-owner"><span>Owner:</span> <span th:text="${currentShop.getOwner().username}"></span></h4>
+    <h5 class="my-products"><span>Store products:</span></h5>
     <div class="mb-3">
 
         <div th:if="${currentShop.getOwner() == currentUser || #lists.contains(currentUser.roles.![name], 'ROLE_ADMIN')}">

@@ -26,7 +26,7 @@ public class CartProductService {
     private final CharacteristicRepository characteristicRepository;
 
     public void saveCartProduct(User currentUser,Product product){
-        Cart currentCart =currentUser.getCart();
+        Cart currentCart = currentUser.getCart();
         if(containsProduct(currentCart,product)){
             saveCartProductIfAlreadyHaveInCart(currentUser,product);
         }
@@ -37,6 +37,9 @@ public class CartProductService {
         Cart cart = currentUser.getCart();
         CartProduct cartProductForSave = new CartProduct();
         cartProductForSave.setProduct(product);
+        if(product.getAmountInStore() >0){
+            cartProductForSave.setQuantity(1);
+        }
         cartProductForSave.setQuantity(1);
         cartProductForSave.setCart(cart);
 
@@ -71,14 +74,32 @@ public class CartProductService {
         for (CartProduct cartProduct:cart.getCartProducts()
              ) {
             if(cartProduct.getProduct() == product){
-                cartProduct.setQuantity(cartProduct.getQuantity() + 1);
-                cartProductRepository.save(cartProduct);
+                if(cartProduct.getQuantity()+1 <= product.getAmountInStore()){
+                    cartProduct.setQuantity(cartProduct.getQuantity() + 1);
+                    cartProductRepository.save(cartProduct);
+                }
+                else cartProductRepository.save(cartProduct);
+
+
             }
         }
         cartService.calculateTotalCost(cart);
         log.info("called method calculate cart for not first CartProduct");
 
     }
+
+   public boolean checkAvailability(User currentUser,Product product){
+       Cart cart = currentUser.getCart();
+       for (CartProduct cartProduct:cart.getCartProducts()
+       ) {
+           if(cartProduct.getProduct() == product){
+               if(cartProduct.getQuantity()+1 > product.getAmountInStore()){
+                   return false;
+               }
+           }
+       }
+       return true;
+   }
 
     public boolean containsProduct(Cart cart,Product product){
         boolean isContains = false;

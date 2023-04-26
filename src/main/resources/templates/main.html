@@ -81,6 +81,9 @@
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
     <span th:if="${productList.size()==0}" >NOT PRODUCTS</span>
+    <div th:if="${cartProductError}">
+        <div class="alert alert-danger" th:text="${cartProductError}"></div>
+    </div>
     <div class="product-container">
         <a style="text-decoration: none;color: inherit" th:each="product : ${productList}" th:href="@{/viewProduct(productId=${product.id})}" th:data-id="${product.id}" class="product-item">
             <span class="product-name" th:text="${product.name}" />

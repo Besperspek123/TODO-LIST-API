@@ -31,18 +31,46 @@
         .mb-3 {
             margin-top: 20px;
         }
+        hr {
+            height: 3px;
+            border: none;
+            background: linear-gradient(to right, #f00, #0f0, #00f);
+            opacity: 0.7;
+            width: 75%;
+            margin: 20px auto;
+        }
     </style>
 </head>
 <body>
 
 <div th:replace="~{header :: content}"></div>
 
+
+
 <div class="mb-3">
     <a class="btn btn-primary add-shop-button" href="/addShop">Add Shop</a>
 </div>
 
+<h3 style="text-align: center">ACTIVE STORES</h3>
+<span th:if="${listActiveShopForCurrentUser.size()==0}">There's nothing here yet</span>
+
 <div style="display: flex; flex-wrap: wrap; justify-content: center; width: 800px; margin: 10px auto;gap: 15px">
-    <a th:href="@{/viewShop(shopId=${shop.id})}" th:data-id="${shop.id}" class="shop-block" th:each="shop : ${listShopForCurrentUser}"
+    <a th:href="@{/viewShop(shopId=${shop.id})}" th:data-id="${shop.id}" class="shop-block" th:each="shop : ${listActiveShopForCurrentUser}"
+       style="align-items: center;
+            justify-content: center;
+            flex-basis: 30%;
+            text-decoration: none;
+            color: inherit;">
+        <h3 th:text="${shop.name}" style="text-align: center; margin: auto;"/>
+    </a>
+</div>
+
+<hr>
+
+<h3 style="text-align: center">STORES THAT ARE UNDER MODERATION </h3>
+<span th:if="${listModerationShopForCurrentUser.size()==0}">There's nothing here yet</span>
+<div style="display: flex; flex-wrap: wrap; justify-content: center; width: 800px; margin: 10px auto;gap: 15px">
+    <a th:href="@{/viewShop(shopId=${shop.id})}" th:data-id="${shop.id}" class="shop-block" th:each="shop : ${listModerationShopForCurrentUser}"
        style="align-items: center;
             justify-content: center;
             flex-basis: 30%;

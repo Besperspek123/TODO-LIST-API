@@ -40,13 +40,13 @@
 
                     <label class="form-label" for="price">Price</label>
                     <input th:value="${productForm.price}" class="form-control" id="price" name="price" placeholder="Enter a price"
-                           type="number" required maxlength="20">
+                           type="number" required maxlength="20" min="1" >
                 </div>
                 <div class="mb-3">
 
                     <label class="form-label" for="amountInStore">Amount</label>
                     <input th:value="${productForm.amountInStore}" class="form-control" id="amountInStore" name="amountInStore" placeholder="Enter amount"
-                           type="number" required maxlength="5">
+                           type="number" required maxlength="5" min="1">
                 </div>
                 <div class="mb-3">
 

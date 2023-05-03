@@ -1,7 +1,10 @@
 package spring.rest.shop.springrestshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,9 +19,11 @@ public class Cart {
     @Column(name = "id")
     private long id;
 
+    @JsonBackReference
     @OneToOne
     private User buyer;
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "cart")
     private List<CartProduct> cartProducts = new ArrayList<>();
 

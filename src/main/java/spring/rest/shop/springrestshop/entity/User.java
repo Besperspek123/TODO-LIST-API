@@ -1,6 +1,8 @@
 package spring.rest.shop.springrestshop.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
@@ -18,6 +20,7 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Organization> organizationList = new ArrayList<>();
 
@@ -30,11 +33,13 @@ public class User implements UserDetails {
     @Column(name = "password")
     private String password;
 
+    @JsonManagedReference
     @OneToOne
     private Cart cart;
 
     @Transient
     private String passwordConfirm;
+
     @CollectionTable(name = "user_role",joinColumns = @JoinColumn(name = "user_id"))
     @ElementCollection(targetClass = Role.class,fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
@@ -46,6 +51,7 @@ public class User implements UserDetails {
     @Column(name = "balance")
     private long Balance;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer")
     private List<Order> orderList = new ArrayList<>();
 
@@ -91,5 +97,15 @@ public class User implements UserDetails {
         return Objects.equals(id, user.id) &&
                 Objects.equals(username, user.username) &&
                 Objects.equals(email, user.email);
+    }
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", username='" + username + '\'' +
+                ", activity=" + activity +
+                ", email='" + email + '\'' +
+                ", Balance=" + Balance +
+                '}';
     }
 }

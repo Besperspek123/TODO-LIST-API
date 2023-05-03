@@ -26,8 +26,6 @@ public class UserController {
     @Autowired
     ProductService productService;
 
-
-
     @GetMapping("/login")
     public String loginPage(){
         return "login";
@@ -44,9 +42,7 @@ public class UserController {
         return "registration";
     }
     @GetMapping("/main")
-    public String pageAfterSuccessLogin(@RequestParam (name = "cartProductError",required = false)  String cartProductError, Model model, Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String pageAfterSuccessLogin(@RequestParam (name = "cartProductError",required = false) String cartProductError, Model model, Authentication authentication){
         model.addAttribute("productList", productService.getListProductsWhereShopActivityTrue());
         if(cartProductError!=null){
             model.addAttribute("cartProductError",cartProductError);

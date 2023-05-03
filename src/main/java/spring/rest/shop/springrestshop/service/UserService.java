@@ -3,12 +3,15 @@ package spring.rest.shop.springrestshop.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.PermissionForBanAndUnbanUserDeniedException;
 import spring.rest.shop.springrestshop.exception.UserBannedException;
@@ -22,6 +25,8 @@ import java.util.List;
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
+
+    private final CurrentUserAspect userAspect;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -95,7 +100,8 @@ public class UserService implements UserDetailsService {
         }
        return false;
     }
-    public void banUser(User userForBan,User currentUser){
+    public void banUser(User userForBan){
+        User currentUser = userAspect.getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
         try {
             if(currentUser.getRoles().contains(Role.ROLE_ADMIN) && !userForBan.getRoles().contains(Role.ROLE_ADMIN)){
                 userForBan.setActivity(false);

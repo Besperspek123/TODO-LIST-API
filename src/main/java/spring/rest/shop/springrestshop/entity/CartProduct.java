@@ -1,5 +1,7 @@
 package spring.rest.shop.springrestshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -15,10 +17,12 @@ public class CartProduct {
     @Column(name = "id")
     private long id;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "cart_id")
     private Cart cart;
 
+    @JsonManagedReference
     @ManyToOne
     @JoinColumn(name = "productId")
     private Product product;
@@ -26,6 +30,7 @@ public class CartProduct {
     @Column(name = "quantity")
     private int quantity;
 
+    @JsonBackReference
     @ManyToMany(mappedBy = "productList")
     private List<Order> ordersList = new ArrayList<>();
 

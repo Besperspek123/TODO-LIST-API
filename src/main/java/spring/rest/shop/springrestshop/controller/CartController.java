@@ -34,7 +34,6 @@ public class CartController {
         User currentUser = userService.findUserByUsername(authentication.getName());
         Product productForAddToCart = productService.getProductDetails(productId);
 
-        model.addAttribute("currentUser",currentUser);
 
         if (productForAddToCart.getAmountInStore() == 0){
             redirectAttributes.addAttribute("cartProductError","В магазине нет товара");

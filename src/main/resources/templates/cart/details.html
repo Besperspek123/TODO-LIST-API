@@ -88,7 +88,7 @@
                     <div th:each="cartProduct : ${currentUser.getCart().getCartProducts()}" class="product-item">
                         <a style="text-decoration: none;color: inherit; width: 50%;" th:href="@{/viewProduct(productId=${cartProduct.getProduct().id})}" th:data-id="${cartProduct.getProduct().id}">
                             <div class="product-info">
-                                <span class="product-name" th:text="${cartProduct.getProduct().name}" />
+                                <span class="product-name" th:text="${cartProduct.getProduct().getName()}" />
                                 <span class="product-price">
                                 <span th:text="${cartProduct.getProduct().price}" />
                                 <span class="product-currency">&#8381;</span>

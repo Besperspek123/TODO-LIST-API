@@ -1,5 +1,6 @@
 package spring.rest.shop.springrestshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class Product {
     @Column(name = "description")
     private String description;
 
+    @JsonBackReference
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
@@ -32,12 +34,15 @@ public class Product {
     @Column(name = "sale")
     private int Sale;
 
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.REMOVE)
     @CollectionTable(name = "product_review",joinColumns = @JoinColumn(name = "product_id"))
     private List<Review> reviewsList;
 
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL)
     private List<Characteristic> characteristicList;
+    @JsonBackReference
     @OneToMany(cascade = CascadeType.ALL)
     private List<Keyword> keywordsList;
 

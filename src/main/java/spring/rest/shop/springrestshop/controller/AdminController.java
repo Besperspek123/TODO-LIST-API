@@ -24,56 +24,43 @@ public class AdminController {
     private ShopService shopService;
 
     @GetMapping("/panel")
-    public String userList(Model model, Authentication authentication) {
-        model.addAttribute("currentUser",userService.findUserByUsername(authentication.getName()));
+    public String userList(Model model) {
         model.addAttribute("allUsers", userService.getAllUsers());
         return "redirect:/admin/users";
     }
 
     @GetMapping("/users")
-    public String getUsersInAdminPanel(Model model, Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
-        List<User> allUsers = userService.getAllUsers();
+    public String getUsersInAdminPanel(Model model){
+      List<User> allUsers = userService.getAllUsers();
         model.addAttribute("allUsers",allUsers);
         return "admin/users";
     }
     @GetMapping("/shops")
-    public String getShopsInAdminPanel(Model model, Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String getShopsInAdminPanel(Model model){
         List<Organization> allShops = shopService.getAllShops();
         model.addAttribute("allShops",allShops);
         return "admin/shops";
     }
     @GetMapping("/searchUser")
-    public String searchUser(@RequestParam(name = "searchQuery") String searchQuery,Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String searchUser(@RequestParam(name = "searchQuery") String searchQuery,Model model){
         List<User> users = userService.findUsersByUsernameContaining(searchQuery);
         model.addAttribute("allUsers",users);
         return "admin/users";
     }
     @GetMapping("/userInfo")
-    public String userInfo(@RequestParam(name = "userId")long userId,Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String userInfo(@RequestParam(name = "userId")long userId,Model model){
         User user = userService.getUserById(userId);
         model.addAttribute("user",user);
         return "admin/user-info";
     }
     @GetMapping("/shopInfo")
-    public String shopInfo(@RequestParam(name = "shopId")long shopId,Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String shopInfo(@RequestParam(name = "shopId")long shopId,Model model){
         Organization shop = shopService.getShopDetails((int)shopId);
         model.addAttribute("currentShop",shop);
         return "shop/details";
     }
     @GetMapping("/searchShop")
-    public String searchShop(@RequestParam(name = "searchQuery") String searchQuery,Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String searchShop(@RequestParam(name = "searchQuery") String searchQuery,Model model){
         List<Organization> shops = shopService.getShopsByNameContaining(searchQuery);
         model.addAttribute("allShops",shops);
         return "admin/shops";
@@ -82,7 +69,7 @@ public class AdminController {
     public String banUser(@RequestParam(name = "userId")long userId,Authentication authentication){
         User userForBan = userService.getUserById(userId);
         User currentUser = userService.findUserByUsername(authentication.getName());
-        userService.banUser(userForBan,currentUser);
+        userService.banUser(userForBan);
         return "redirect:/admin/userInfo?userId=" + userId;
     }
     @PostMapping("/unbanUser")

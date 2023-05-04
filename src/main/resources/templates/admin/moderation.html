@@ -84,6 +84,12 @@
             color: #666;
             margin-left: 2px;
         }
+        .button-moderation {
+            text-align: center;
+            display: block;
+            alignment: center;
+            margin-bottom: 2px;
+        }
 
     </style>
 </head>
@@ -98,13 +104,15 @@
         <button class="btn btn-outline-success" type="submit">Search</button>
     </form>
 
-    <form th:action="@{/admin/appr  oveAllShops}" method="post">
+    <form th:if="${allShops.size()>0}" class="button-moderation" th:action="@{/admin/appr  oveAllShops}" method="post">
         <button type="submit" class="btn btn-primary">Approve All</button>
     </form>
-    <form th:action="@{/admin/disapproveAllShops}" method="post">
+    <form th:if="${allShops.size()>0}" class="button-moderation" th:action="@{/admin/disapproveAllShops}" method="post">
         <button type="submit" class="btn btn-primary">Disapprove All</button>
     </form>
-    <span style="text-align: center" th:if="${allShops.size()==0}" >NOT SHOPS FOR MODERATION</span>
+    <div style="display: flex; justify-content: center;">
+        <span style="font-size: 3rem; text-align: center;" th:if="${allShops.size()==0}">NOT SHOPS FOR MODERATION</span>
+    </div>
     <div class="product-container">
         <a style="text-decoration: none;color: inherit" th:each="shop : ${allShops}" th:href="@{/admin/shopInfo(shopId=${shop.id})}" th:data-id="${shop.id}" class="product-item">
             <span class="product-name" th:text="${shop.name}" />

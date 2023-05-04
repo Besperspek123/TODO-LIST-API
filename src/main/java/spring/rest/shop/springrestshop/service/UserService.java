@@ -15,6 +15,7 @@ import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.PermissionForBanAndUnbanUserDeniedException;
 import spring.rest.shop.springrestshop.exception.UserBannedException;
+import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
 import spring.rest.shop.springrestshop.repository.*;
 
 import java.util.List;
@@ -39,7 +40,8 @@ public class UserService implements UserDetailsService {
 //        if (!user.getActivity()) {
 //            throw new UserBannedException("User is banned"); // Исключение при неактивном пользователе
 //        }
-        return user;
+        return JwtEntityFactory.create(user);
+
     }
     public boolean checkIfUserExistsByUsername(String username){
         if(userRepository.findByUsername(username) == null){

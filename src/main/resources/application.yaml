@@ -1,0 +1,5 @@
+security:
+  jwt:
+    secret: ZGZnaGZnZGhkZmdoZGZnaGRmZ2hkZmdoZGZnaGRmZ2gNCg==
+    access: 3600000
+    refresh: 2692000000

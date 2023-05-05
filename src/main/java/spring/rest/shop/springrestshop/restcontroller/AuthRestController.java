@@ -18,8 +18,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import spring.rest.shop.springrestshop.dto.SignUpDto;
 import spring.rest.shop.springrestshop.dto.auth.JwtRequest;
 import spring.rest.shop.springrestshop.dto.auth.JwtResponse;
+import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.repository.UserRepository;
 import spring.rest.shop.springrestshop.service.AuthService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -50,5 +52,18 @@ public class AuthRestController{
 @PostMapping("/login")
 public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest) {
     return authService.login(loginRequest);
+}
+
+@PostMapping("/register")
+public User register(@Validated @RequestBody SignUpDto user){
+
+    try {
+        authService.register(user);
+    }
+    catch (Exception e){
+
+        System.out.println(e.getMessage());
+    }
+    return userService.findUserByUsername(user.getUsername());
 }
 }

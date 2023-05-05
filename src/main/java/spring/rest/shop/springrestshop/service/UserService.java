@@ -95,7 +95,7 @@ public class UserService implements UserDetailsService {
                 user.setCart(cart);
             }
 
-
+            user.setPasswordConfirm("");
             userRepository.save(user); // сохраняем пользователя
             log.info("Saving new User with username: {}", user.getUsername());
             return true;

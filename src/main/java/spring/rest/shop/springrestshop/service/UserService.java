@@ -3,8 +3,6 @@ package spring.rest.shop.springrestshop.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,9 +10,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.PermissionForBanAndUnbanUserDeniedException;
-import spring.rest.shop.springrestshop.exception.UserBannedException;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
 import spring.rest.shop.springrestshop.repository.*;
 
@@ -103,7 +101,7 @@ public class UserService implements UserDetailsService {
        return false;
     }
     public void banUser(User userForBan){
-        User currentUser = userAspect.getCurrentUser(SecurityContextHolder.getContext().getAuthentication());
+        User currentUser = SecurityContext.getCurrentUser();
         try {
             if(currentUser.getRoles().contains(Role.ROLE_ADMIN) && !userForBan.getRoles().contains(Role.ROLE_ADMIN)){
                 userForBan.setActivity(false);
@@ -117,7 +115,8 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void unbanUser(User userForUnban,User currentUser){
+    public void unbanUser(User userForUnban){
+        User currentUser = SecurityContext.getCurrentUser();
         try {
             if(currentUser.getRoles().contains(Role.ROLE_ADMIN)){
                 userForUnban.setActivity(true);

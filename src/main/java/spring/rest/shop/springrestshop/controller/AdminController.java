@@ -1,5 +1,7 @@
 package spring.rest.shop.springrestshop.controller;
 
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
@@ -17,11 +19,10 @@ import java.util.List;
 
 @Controller
 @RequestMapping("/admin")
+@AllArgsConstructor
 public class AdminController {
-    @Autowired
-    private UserService userService;
-    @Autowired
-    private ShopService shopService;
+    private final UserService userService;
+    private final ShopService shopService;
 
     @GetMapping("/panel")
     public String userList(Model model) {
@@ -75,8 +76,7 @@ public class AdminController {
     @PostMapping("/unbanUser")
     public String unbanUser(@RequestParam(name = "userId")long userId,Authentication authentication){
         User userForUnban = userService.getUserById(userId);
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        userService.unbanUser(userForUnban,currentUser);
+        userService.unbanUser(userForUnban);
         return "redirect:/admin/userInfo?userId=" + userId;
     }
 

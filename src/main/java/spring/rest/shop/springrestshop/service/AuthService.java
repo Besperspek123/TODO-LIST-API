@@ -4,9 +4,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Service;
-import spring.rest.shop.springrestshop.dto.SignUpDto;
-import spring.rest.shop.springrestshop.dto.auth.JwtRequest;
-import spring.rest.shop.springrestshop.dto.auth.JwtResponse;
+import spring.rest.shop.springrestshop.dto.auth.SignUpDto;
+import spring.rest.shop.springrestshop.dto.jwt.JwtRequest;
+import spring.rest.shop.springrestshop.dto.jwt.JwtResponse;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.jwt.JwtTokenProvider;
@@ -39,7 +39,7 @@ public class AuthService {
     public void register(SignUpDto user) throws UserAlreadyRegisteredException {
         if(userService.findUserByUsername(user.getUsername())!=null)
         {
-            throw new UserAlreadyRegisteredException("User with this username already registered");
+            throw new UserAlreadyRegisteredException("User with username: "+ user.getUsername() +" already registered");
         }
         User userForRegistration= new User();
         userForRegistration.setUsername(user.getUsername());

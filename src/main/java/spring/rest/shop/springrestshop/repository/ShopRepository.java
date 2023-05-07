@@ -11,7 +11,7 @@ public interface ShopRepository extends JpaRepository<Organization, Long> {
         List<Organization> getAllByOwnerAndActivityTrue(User user);
         List<Organization> getAllByOwnerAndActivityFalse(User user);
         List<Organization> getAllByActivityIsFalse();
-        Organization getOrganizationById(int id);
+        Organization getOrganizationById(long id);
 
         List<Organization> getAllByActivityIsTrue();
         List<Organization> getAllByNameContaining(String string);

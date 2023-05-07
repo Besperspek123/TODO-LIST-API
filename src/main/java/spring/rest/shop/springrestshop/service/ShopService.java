@@ -20,7 +20,6 @@ public class ShopService {
     private final CartRepository cartRepository;
     private final OrderRepository orderRepository;
     private final CartService cartService;
-    private final ProductRepository productRepository;
     private final UserRepository userRepository;
     private final CartProductRepository cartProductRepository;
 
@@ -92,14 +91,14 @@ public class ShopService {
 //        shopRepository.deleteById((long) id);
 //    }
 
-    public void deleteShop(int shopId, User user) {
+    public void deleteShop(long shopId, User user) {
         if(shopRepository.getOrganizationById(shopId).getOwner() == user
                 || user.getRoles().contains(Role.ROLE_ADMIN)){
-            List<Product> productListForDeletedShop = productRepository.findByOrganization_Id(shopId);
+            List<Product> productListForDeletedShop = productService.getProductsFromShop(shopId);
             for (Product product:productListForDeletedShop
             ) {
                 product.setOrganization(null);
-                productRepository.save(product);
+                productService.save(product);
             }
             List<Cart> cartThatContainCartProductWhereOrganizationNull = cartRepository.getAllBy();
             for (Cart cart:cartThatContainCartProductWhereOrganizationNull
@@ -157,6 +156,9 @@ public class ShopService {
             deleteShop(shop.getId(),currentUser);
 
         }
+    }
+    public Organization getShopById(long shopId){
+        return shopRepository.getOrganizationById(shopId);
     }
 }
 

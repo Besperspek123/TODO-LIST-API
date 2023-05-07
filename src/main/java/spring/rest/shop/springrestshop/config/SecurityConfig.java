@@ -83,7 +83,7 @@ public class SecurityConfig {
                 })
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setStatus(HttpStatus.FORBIDDEN.value());
-                    response.getWriter().write("UNAUTHORIZED");
+                    response.getWriter().write("DENIED");
                 })
                 .and()
                 .logout()

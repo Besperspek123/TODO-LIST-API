@@ -14,4 +14,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
         public List<Product> findByOrganization_Id(long id);
 
+        public List<Product> findAllByOrganization_ActivityTrue();
+
 }

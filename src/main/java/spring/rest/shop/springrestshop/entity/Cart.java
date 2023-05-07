@@ -19,11 +19,9 @@ public class Cart {
     @Column(name = "id")
     private long id;
 
-    @JsonBackReference
     @OneToOne
     private User buyer;
 
-    @JsonManagedReference
     @OneToMany(mappedBy = "cart")
     private List<CartProduct> cartProducts = new ArrayList<>();
 

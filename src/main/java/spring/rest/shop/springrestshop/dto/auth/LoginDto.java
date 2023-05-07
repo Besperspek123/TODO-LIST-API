@@ -1,4 +1,4 @@
-package spring.rest.shop.springrestshop.dto;
+package spring.rest.shop.springrestshop.dto.auth;
 
 import lombok.Data;
 

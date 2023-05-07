@@ -30,13 +30,14 @@ public class User implements UserDetails {
     @Column(name = "activity")
     private Boolean activity;
 
+    @JsonIgnore
     @Column(name = "password")
     private String password;
 
-    @JsonManagedReference
     @OneToOne
     private Cart cart;
 
+    @JsonIgnore
     @Transient
     private String passwordConfirm;
 

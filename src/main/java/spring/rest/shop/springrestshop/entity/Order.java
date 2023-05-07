@@ -19,7 +19,6 @@ public class Order {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonManagedReference
     private User customer;
 
     @Column(name = "price")

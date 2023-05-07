@@ -1,5 +1,6 @@
 package spring.rest.shop.springrestshop.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class Organization {
     @Id
     @Column(name = "id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(name = "name")
     private String name;
@@ -25,7 +26,6 @@ public class Organization {
 
     @ManyToOne
     @JoinColumn(name = "user_id")
-    @JsonManagedReference
     private User owner;
 
     @Column(name = "activity")

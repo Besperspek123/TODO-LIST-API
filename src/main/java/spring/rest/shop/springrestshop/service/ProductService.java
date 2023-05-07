@@ -3,7 +3,9 @@ package spring.rest.shop.springrestshop.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.exception.UnauthorizedShopAccessException;
 import spring.rest.shop.springrestshop.repository.*;
 
 import java.util.ArrayList;
@@ -15,32 +17,32 @@ import java.util.List;
 public class ProductService {
 
     private final ProductRepository productRepository;
-    private final ShopRepository shopRepository;
 
+    private final ShopRepository shopRepository;
     private final KeywordRepository keywordRepository;
     private final CharacteristicRepository characteristicRepository;
 
 
-    public List<Product> getListProductsWhereShopActivityTrue(){
-        List<Product> allProducts =productRepository.getAllBy();
-        List<Product> allProductWhereShopActivityTrue = new ArrayList<>();
-        for (Product product:allProducts
-             ) {
-            if(product.getOrganization() != null){
-                if (product.getOrganization().isActivity()){
-                    allProductWhereShopActivityTrue.add(product);
-                }
-            }
-        }
-        return allProductWhereShopActivityTrue;
+    public List<Product> getAvailableProductsList(){
+        return productRepository.findAllByOrganization_ActivityTrue();
     }
 
+    public List<Product> getProductsFromShop(long shopId){
+        return productRepository.findByOrganization_Id(shopId);
+    }
 
-    public Product getProductDetails(int id){
+    public Product getProductDetails(long id){
         return productRepository.getById(id);
     }
-    public void saveProduct(Product product,int shopId){
+    public void addProduct(Product product, long shopId) throws UnauthorizedShopAccessException {
+        User currentUser = SecurityContext.getCurrentUser();
+        Organization shop = shopRepository.getOrganizationById(shopId);
 
+        if(shop.getOwner() != currentUser
+        || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
+            throw new UnauthorizedShopAccessException("You are trying add product in not your shop");
+        }
+//        product.setOrganization(shopService.getShopById(shopId));
         product.setOrganization(shopRepository.getOrganizationById(shopId));
 
         List<Characteristic> characteristicList = new ArrayList<>();
@@ -50,7 +52,6 @@ public class ProductService {
             characteristicRepository.save(characteristic);
             characteristicList.add(characteristic);
         }
-
 
         product.setCharacteristicList(characteristicList);
 
@@ -68,13 +69,15 @@ public class ProductService {
         shopRepository.getOrganizationById(shopId).getProductList().add(product);
     }
 
-    public void deleteProduct(User currentUser,Product product){
+    public void deleteProduct(long productId){
+        User currentUser = SecurityContext.getCurrentUser();
+        Product product = productRepository.getById(productId);
         if(product.getOrganization().getOwner() == currentUser
                 || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
             productRepository.deleteById(product.getId());
         }
     }
-    public List<Product> findProductByNameContainingAndShopActivityTrue(String name){
+    public List<Product> findProductByName(String name){
 
         productRepository.findAllByNameContaining(name);
         List<Product> allProductsByNameContaining =  productRepository.findAllByNameContaining(name);
@@ -91,5 +94,8 @@ public class ProductService {
 
     }
 
+    public void save(Product product) {
+        productRepository.save(product);
+    }
 }
 

@@ -1,6 +1,8 @@
 package spring.rest.shop.springrestshop.entity;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -22,7 +24,7 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @JsonBackReference
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
@@ -34,15 +36,15 @@ public class Product {
     @Column(name = "sale")
     private int Sale;
 
-    @JsonBackReference
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.REMOVE)
     @CollectionTable(name = "product_review",joinColumns = @JoinColumn(name = "product_id"))
     private List<Review> reviewsList;
 
-    @JsonBackReference
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     private List<Characteristic> characteristicList;
-    @JsonBackReference
+    @JsonIgnore
     @OneToMany(cascade = CascadeType.ALL)
     private List<Keyword> keywordsList;
 

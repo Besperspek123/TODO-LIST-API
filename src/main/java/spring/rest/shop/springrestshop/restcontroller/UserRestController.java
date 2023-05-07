@@ -1,22 +1,22 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
+import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.dto.user.UserDTO;
 import spring.rest.shop.springrestshop.service.UserService;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
-public class UserRestController extends BaseRestController{
+@RequestMapping("/api")
+@AllArgsConstructor
+public class UserRestController {
 
-    @Autowired
-    private UserService userService;
+    private final UserService userService;
 
-    @GetMapping("/users")
-    public List<User> getAllUsers(){
-        return userService.getAllUsers();
 
-    }
 }

@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.PermissionForSaveThisProductDeniedException;
+import spring.rest.shop.springrestshop.exception.UnauthorizedShopAccessException;
 import spring.rest.shop.springrestshop.repository.ProductRepository;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
@@ -45,12 +46,12 @@ public class ProductController {
         }
         @PostMapping("/addProduct")
         public String addProductForCurrentShop(@ModelAttribute("productForm") @Validated Product productForm,
-        @RequestParam ("shopId") int shopId,Authentication authentication){
+        @RequestParam ("shopId") int shopId,Authentication authentication) throws UnauthorizedShopAccessException {
             User currentUser = userService.findUserByUsername(authentication.getName());
             if(productForm.getId() != 0){
                 if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
                         || currentUser == productService.getProductDetails((int)productForm.getId()).getOrganization().getOwner()){
-                    productService.saveProduct(productForm, shopId);
+                    productService.addProduct(productForm, shopId);
                 }
                 else try {
                     throw new PermissionForSaveThisProductDeniedException("Denied");
@@ -58,7 +59,7 @@ public class ProductController {
                     System.out.println(e.getMessage());
                 }
             }
-            else productService.saveProduct(productForm, shopId);
+            else productService.addProduct(productForm, shopId);
         return "redirect:/viewShop?shopId="+ shopId;
         }
 
@@ -72,11 +73,11 @@ public class ProductController {
         }
 
         @PostMapping("/deleteProduct")
-        public String deleteProduct(@RequestParam("productId") int productId, Model model,Authentication authentication){
+        public String deleteProduct(@RequestParam("productId") long productId, Model model,Authentication authentication){
             Product product = productService.getProductDetails(productId);
-            int shopId = product.getOrganization().getId();
+            long shopId = product.getOrganization().getId();
             User currentUser = userService.findUserByUsername(authentication.getName());
-                productService.deleteProduct(currentUser,product);
+                productService.deleteProduct(product.getId());
             return "redirect:/viewShop?shopId=" + shopId;
         }
 
@@ -90,7 +91,7 @@ public class ProductController {
         }
         @GetMapping("/searchProducts")
         public String searchProducts(@RequestParam("searchQuery") String searchQuery,Model model,Authentication authentication){
-            List<Product> productList = productService.findProductByNameContainingAndShopActivityTrue(searchQuery);
+            List<Product> productList = productService.findProductByName(searchQuery);
             User currentUser = userService.findUserByUsername(authentication.getName());
             model.addAttribute("productList",productList);
             model.addAttribute("currentUser",currentUser);

@@ -1,4 +1,4 @@
-package spring.rest.shop.springrestshop.dto.auth;
+package spring.rest.shop.springrestshop.dto.jwt;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.NotNull;

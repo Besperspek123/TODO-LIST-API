@@ -11,7 +11,6 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.entity.User;
-import spring.rest.shop.springrestshop.exception.UserBannedException;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -43,7 +42,7 @@ public class UserController {
     }
     @GetMapping("/main")
     public String pageAfterSuccessLogin(@RequestParam (name = "cartProductError",required = false) String cartProductError, Model model, Authentication authentication){
-        model.addAttribute("productList", productService.getListProductsWhereShopActivityTrue());
+        model.addAttribute("productList", productService.getAvailableProductsList());
         if(cartProductError!=null){
             model.addAttribute("cartProductError",cartProductError);
         }

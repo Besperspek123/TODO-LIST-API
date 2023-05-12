@@ -3,6 +3,7 @@ package spring.rest.shop.springrestshop.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.repository.*;
 
@@ -32,20 +33,20 @@ public class ShopService {
         return shopRepository.getAllByOwnerAndActivityFalse(currentUser);
     }
 
-    public void saveShop(Organization shop,User owner){
+    public void saveShop(Organization shop){
         if (shop.getName()!= null) {
             if (shop.getId() == 0) {
-                shop.setOwner(owner);
+                shop.setOwner(SecurityContext.getCurrentUser());
             } else {
                 shop.setOwner(shopRepository.getOrganizationById(shop.getId()).getOwner());
             }
 
 
-            //need to change in false when be make admin mode
-
+            //TODO need to change in false when be make admin mode
 //        if(!owner.getRoles().contains(Role.ROLE_ADMIN)){
 //            shop.setActivity(false);
 //        }
+
             shop.setActivity(true);
             shopRepository.save(shop);
         }
@@ -62,34 +63,6 @@ public class ShopService {
     public List<Organization> getShopsByNameContaining(String string){
         return shopRepository.getAllByNameContainingAndActivityIsTrue(string);
     }
-
-//    public void deleteShop(int id, User user) {
-//        List<Cart> cartsListForAllUser = cartRepository.findAll();
-//        for (Cart cart : cartsListForAllUser) {
-//            List<CartProduct> productListForCart = cart.getCartProducts();
-//            List<Product> listProductForDeleteShop = shopRepository.getOrganizationById(id).getProductList();
-//
-//            // удаление связей в таблице cart_product
-//            List<CartProduct> cartProductsToRemove = new ArrayList<>();
-//            for (CartProduct cartProduct : productListForCart) {
-//                if (listProductForDeleteShop.contains(cartProduct.getProduct())) {
-//                    cartProductsToRemove.add(cartProduct);
-//                }
-//            }
-//            cart.getCartProducts().removeAll(cartProductsToRemove);
-//            cartProductRepository.deleteAll(cartProductsToRemove);
-//
-//            cartRepository.save(cart);
-//        }
-//
-//        // удаление продуктов
-//        List<Product> productsToRemove = shopRepository.getOrganizationById(id).getProductList();
-//        for (Product product : productsToRemove) {
-//            productRepository.delete(product);
-//        }
-//
-//        shopRepository.deleteById((long) id);
-//    }
 
     public void deleteShop(long shopId, User user) {
         if(shopRepository.getOrganizationById(shopId).getOwner() == user
@@ -119,7 +92,7 @@ public class ShopService {
                     cartRepository.save(cart);
                     cartService.calculateTotalCost(cart);
                 }
-            shopRepository.deleteById((long)shopId);
+            shopRepository.deleteById(shopId);
             }
 
 

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.User;
@@ -30,8 +31,8 @@ public class OrderController {
     private CartProductService cartProductService;
 
     @PostMapping("/createOrder")
-    public String createOrder(Authentication authentication,RedirectAttributes redirectAttributes){
-        User currentUser = userService.findUserByUsername(authentication.getName());
+    public String createOrder(RedirectAttributes redirectAttributes){
+        User currentUser = SecurityContext.getCurrentUser();
         Cart currentCart = currentUser.getCart();
         if(currentCart.getCartProducts().size() != 0){
             orderService.createOrder(currentUser,currentCart);
@@ -42,8 +43,8 @@ public class OrderController {
     }
 
     @GetMapping("/orders")
-    public String ordersPage(Authentication authentication, Model model){
-        User currentUser = userService.findUserByUsername(authentication.getName());
+    public String ordersPage(Model model){
+        User currentUser = SecurityContext.getCurrentUser();
         model.addAttribute("currentUser",currentUser);
         model.addAttribute("ordersList",currentUser.getOrderList());
 
@@ -51,10 +52,9 @@ public class OrderController {
     }
 
     @GetMapping("/viewOrder")
-    public String viewOrder(@RequestParam(name = "orderId") long orderId,Authentication authentication,Model model){
-        User currentUser = userService.findUserByUsername(authentication.getName());
+    public String viewOrder(@RequestParam(name = "orderId") long orderId,Model model){
+        User currentUser = SecurityContext.getCurrentUser();
         Order order = orderService.getOrderDetails(currentUser,orderId);
-        model.addAttribute("currentUser",currentUser);
         model.addAttribute("order",order);
         return "order/details";
     }

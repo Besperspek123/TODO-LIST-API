@@ -94,6 +94,9 @@
     <ul class="product-characteristics">
         <li th:each="characteristic :${product.characteristicList}" th:text="${characteristic.getDescriptionKey()}"></li>
     </ul>
+    <ul class="product-characteristics">
+        <li th:each="review :${product.reviewsList}" th:text="${review.getComment()}"></li>
+    </ul>
     Price:
     <h4 class="product-price" th:text="${product.price}">&#8381;</h4>
     Amount in store:

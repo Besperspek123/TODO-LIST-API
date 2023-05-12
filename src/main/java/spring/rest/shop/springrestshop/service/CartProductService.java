@@ -25,91 +25,11 @@ public class CartProductService {
 
     private final CharacteristicRepository characteristicRepository;
 
-    public void saveCartProduct(User currentUser,Product product){
-        Cart currentCart = currentUser.getCart();
-        if(containsProduct(currentCart,product)){
-            saveCartProductIfAlreadyHaveInCart(currentUser,product);
-        }
-        else saveCartProductIfHeDontHaveInCart(currentUser,product);
-    }
-
-    public void saveCartProductIfHeDontHaveInCart(User currentUser, Product product) {
-        Cart cart = currentUser.getCart();
-        CartProduct cartProductForSave = new CartProduct();
-        cartProductForSave.setProduct(product);
-        if(product.getAmountInStore() >0){
-            cartProductForSave.setQuantity(1);
-        }
-        cartProductForSave.setQuantity(1);
-        cartProductForSave.setCart(cart);
-
-        cartProductRepository.save(cartProductForSave);
-        cartRepository.save(cart);
-
-        // получаем обновленный объект корзины из базы данных
-        Optional<Cart> optionalCart = cartRepository.findById(cart.getId());
-        if (optionalCart.isPresent()) {
-            cart = optionalCart.get();
-        }
-
-        // присваиваем новый список продуктов в корзину
-        List<CartProduct> updatedProductsInCart = cart.getCartProducts();
-        updatedProductsInCart.add(cartProductForSave);
-        cart.setCartProducts(updatedProductsInCart);
-        cartRepository.save(cart);
-
-        // установить обновленный список продуктов в корзине
-        cart.setCartProducts(updatedProductsInCart);
-        System.out.println(cart.getCartProducts().size());
-        cartService.calculateTotalCost(cart);
-        System.out.println(cart.getCartProducts().size());
-        System.out.println(currentUser.getCart().getCartProducts().size());
-        log.info("called method calculate cart for new CartProduct");
-    }
 
 
+    public void save(CartProduct cartProduct){
+        cartProductRepository.save(cartProduct);
 
-    public void saveCartProductIfAlreadyHaveInCart(User currentUser,Product product){
-        Cart cart = currentUser.getCart();
-        for (CartProduct cartProduct:cart.getCartProducts()
-             ) {
-            if(cartProduct.getProduct() == product){
-                if(cartProduct.getQuantity()+1 <= product.getAmountInStore()){
-                    cartProduct.setQuantity(cartProduct.getQuantity() + 1);
-                    cartProductRepository.save(cartProduct);
-                }
-                else cartProductRepository.save(cartProduct);
-
-
-            }
-        }
-        cartService.calculateTotalCost(cart);
-        log.info("called method calculate cart for not first CartProduct");
-
-    }
-
-   public boolean checkAvailability(User currentUser,Product product){
-       Cart cart = currentUser.getCart();
-       for (CartProduct cartProduct:cart.getCartProducts()
-       ) {
-           if(cartProduct.getProduct() == product){
-               if(cartProduct.getQuantity()+1 > product.getAmountInStore()){
-                   return false;
-               }
-           }
-       }
-       return true;
-   }
-
-    public boolean containsProduct(Cart cart,Product product){
-        boolean isContains = false;
-        for (CartProduct cartProduct: cart.getCartProducts()
-             ) {
-            if(cartProduct.getProduct() == product){
-                isContains = true;
-            }
-        }
-        return isContains;
     }
 
 }

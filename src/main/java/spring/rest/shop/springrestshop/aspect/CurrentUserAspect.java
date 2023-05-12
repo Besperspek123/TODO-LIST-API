@@ -22,7 +22,8 @@ public class CurrentUserAspect {
         return userRepository.findByUsername(authentication.getName());
     }
 
-    @Before("execution(* spring.rest.shop.springrestshop.controller.*.*(..))")
+    @Before("execution(* spring.rest.shop.springrestshop.controller.*.*(..)) ||"
+            + "execution(* spring.rest.shop.springrestshop.restcontroller.*.*(..))")
     public void setCurrentUser(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {

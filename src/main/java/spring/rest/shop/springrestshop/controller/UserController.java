@@ -3,6 +3,7 @@ package spring.rest.shop.springrestshop.controller;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -41,11 +42,8 @@ public class UserController {
         return "registration";
     }
     @GetMapping("/main")
-    public String pageAfterSuccessLogin(@RequestParam (name = "cartProductError",required = false) String cartProductError, Model model, Authentication authentication){
+    public String pageAfterSuccessLogin(Model model){
         model.addAttribute("productList", productService.getAvailableProductsList());
-        if(cartProductError!=null){
-            model.addAttribute("cartProductError",cartProductError);
-        }
         return "main";
     }
 
@@ -75,5 +73,10 @@ public class UserController {
 
         redirectAttributes.addAttribute("success", "true");
         return "redirect:/login";
+    }
+
+    @GetMapping("/users")
+    public ResponseEntity<User> userInfo(){
+        return null;
     }
 }

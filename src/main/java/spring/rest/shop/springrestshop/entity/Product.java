@@ -24,7 +24,6 @@ public class Product {
     @Column(name = "description")
     private String description;
 
-    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "organization_id")
     private Organization organization;
@@ -36,15 +35,14 @@ public class Product {
     @Column(name = "sale")
     private int Sale;
 
-    @JsonIgnore
-    @OneToMany(cascade = CascadeType.REMOVE)
-    @CollectionTable(name = "product_review",joinColumns = @JoinColumn(name = "product_id"))
-    private List<Review> reviewsList;
+    @OneToMany(cascade = CascadeType.ALL)
+    @JoinColumn(name = "product_id")
+    private List<Review> reviewsList = new ArrayList<>();
 
-    @JsonIgnore
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Characteristic> characteristicList;
-    @JsonIgnore
+
     @OneToMany(cascade = CascadeType.ALL)
     private List<Keyword> keywordsList;
 

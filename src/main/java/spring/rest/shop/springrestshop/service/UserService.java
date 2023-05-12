@@ -70,7 +70,7 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
-
+//TODO когда админ меняет пользователя, нельзя оставить ту же почту ибо он думает, что пользователь регистрирует новый акк
     public boolean saveUser(User user) {
         if(userRepository.findByUsername(user.getUsername())==null
                 && userRepository.findByEmail(user.getEmail())==null

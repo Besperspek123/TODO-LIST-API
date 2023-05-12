@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.PermissionForSaveThisProductDeniedException;
@@ -37,17 +38,16 @@ public class ProductController {
 
 
         @GetMapping("/addProduct")
-        public String addProduct(@RequestParam("shopId") int shopId,Model model, Authentication authentication){
-            User currentUser = userService.findUserByUsername(authentication.getName());
-            model.addAttribute("currentUser",currentUser);
+        public String addProduct(@RequestParam("shopId") int shopId,Model model){
             model.addAttribute("productForm",new Product());
             model.addAttribute("shopId",shopId);
             return "product/add-product";
         }
+        //TODO пересмотреть валидация и отправить её в сервис
         @PostMapping("/addProduct")
         public String addProductForCurrentShop(@ModelAttribute("productForm") @Validated Product productForm,
-        @RequestParam ("shopId") int shopId,Authentication authentication) throws UnauthorizedShopAccessException {
-            User currentUser = userService.findUserByUsername(authentication.getName());
+        @RequestParam ("shopId") int shopId) throws UnauthorizedShopAccessException {
+            User currentUser = SecurityContext.getCurrentUser();
             if(productForm.getId() != 0){
                 if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
                         || currentUser == productService.getProductDetails((int)productForm.getId()).getOrganization().getOwner()){
@@ -64,37 +64,30 @@ public class ProductController {
         }
 
         @GetMapping("/editProduct")
-        public String editProduct(@RequestParam("shopId") int shopId,@RequestParam("productId") int productId, Model model, Authentication authentication) {
-            User currentUser = userService.findUserByUsername(authentication.getName());
-            model.addAttribute("currentUser",currentUser);
+        public String editProduct(@RequestParam("shopId") int shopId,@RequestParam("productId") int productId, Model model) {
             model.addAttribute("productForm", productService.getProductDetails(productId));
             model.addAttribute("shopId",shopId);
             return "product/add-product";
         }
 
         @PostMapping("/deleteProduct")
-        public String deleteProduct(@RequestParam("productId") long productId, Model model,Authentication authentication){
+        public String deleteProduct(@RequestParam("productId") long productId){
             Product product = productService.getProductDetails(productId);
             long shopId = product.getOrganization().getId();
-            User currentUser = userService.findUserByUsername(authentication.getName());
-                productService.deleteProduct(product.getId());
+                productService.deleteProductInShop(product.getId());
             return "redirect:/viewShop?shopId=" + shopId;
         }
 
 
         @GetMapping("/viewProduct")
-        public String viewProduct(@RequestParam("productId") int productId, Authentication authentication, Model model){
-            User currentUser = userService.findUserByUsername(authentication.getName());
-            model.addAttribute("currentUser",currentUser);
+        public String viewProduct(@RequestParam("productId") int productId, Model model){
         model.addAttribute(productService.getProductDetails(productId));
         return "product/details";
         }
         @GetMapping("/searchProducts")
-        public String searchProducts(@RequestParam("searchQuery") String searchQuery,Model model,Authentication authentication){
+        public String searchProducts(@RequestParam("searchQuery") String searchQuery,Model model){
             List<Product> productList = productService.findProductByName(searchQuery);
-            User currentUser = userService.findUserByUsername(authentication.getName());
             model.addAttribute("productList",productList);
-            model.addAttribute("currentUser",currentUser);
             return "main";
         }
 }

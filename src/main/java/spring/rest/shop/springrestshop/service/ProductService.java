@@ -21,6 +21,7 @@ public class ProductService {
     private final ShopRepository shopRepository;
     private final KeywordRepository keywordRepository;
     private final CharacteristicRepository characteristicRepository;
+    private final CartProductRepository cartProductRepository;
 
 
     public List<Product> getAvailableProductsList(){
@@ -34,12 +35,14 @@ public class ProductService {
     public Product getProductDetails(long id){
         return productRepository.getById(id);
     }
+
     public void addProduct(Product product, long shopId) throws UnauthorizedShopAccessException {
         User currentUser = SecurityContext.getCurrentUser();
+        System.out.println(currentUser.getUsername());
         Organization shop = shopRepository.getOrganizationById(shopId);
 
-        if(shop.getOwner() != currentUser
-        || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
+        if(!shop.getOwner().equals(currentUser)
+        && currentUser.getRoles().stream().noneMatch(role -> role.name().equals("ROLE_ADMIN"))){
             throw new UnauthorizedShopAccessException("You are trying add product in not your shop");
         }
 //        product.setOrganization(shopService.getShopById(shopId));
@@ -64,17 +67,21 @@ public class ProductService {
         }
 
         product.setKeywordsList(keywordsList);
+        System.out.println("Размер списка отзывов при создании товара: " +
+                        product.getReviewsList().size());
 
         productRepository.save(product);
         shopRepository.getOrganizationById(shopId).getProductList().add(product);
     }
 
-    public void deleteProduct(long productId){
+    public void deleteProductInShop(long productId){
         User currentUser = SecurityContext.getCurrentUser();
         Product product = productRepository.getById(productId);
         if(product.getOrganization().getOwner() == currentUser
                 || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
-            productRepository.deleteById(product.getId());
+
+            product.setOrganization(null);
+            productRepository.save(product);
         }
     }
     public List<Product> findProductByName(String name){

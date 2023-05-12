@@ -2,6 +2,7 @@ package spring.rest.shop.springrestshop.exception_handling;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -37,6 +38,11 @@ public class ExceptionHandlerController {
 
     @ExceptionHandler
     public ResponseEntity<String> userTryEditNotHerProduct(PermissionForSaveThisProductDeniedException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
+
+    }
+    @ExceptionHandler
+    public ResponseEntity<String> userTryAddReviewInProductWhereDontBuy(AccessDeniedException exception){
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.UNAUTHORIZED);
 
     }

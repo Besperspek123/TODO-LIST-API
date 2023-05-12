@@ -10,6 +10,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.service.ProductService;
@@ -30,9 +31,8 @@ public class ShopController {
 
 
             @GetMapping("/shop")
-            public String pageMyShop(Model model,Authentication authentication){
-                User currentUser = userService.findUserByUsername(authentication.getName());
-                model.addAttribute("currentUser",currentUser);
+            public String pageMyShop(Model model){
+                User currentUser = SecurityContext.getCurrentUser();
                 List<Organization> listActiveShopForCurrentUser = shopService.
                         getListActivityShopForCurrentUser(currentUser);
                 List<Organization> listModerationShopForCurrentUser = shopService.getListModerationShopForCurrentUser(currentUser);
@@ -43,30 +43,28 @@ public class ShopController {
             }
 
         @GetMapping("/addShop")
-        public String addShopPage(Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-            model.addAttribute("currentUser",currentUser);
+        public String addShopPage(Model model){
             model.addAttribute("shopForm",new Organization());
             return "shop/add-shop";
         }
 
         @PostMapping("/addShop")
     public String addShop(@ModelAttribute("shopForm") @Validated Organization shopForm,
-                          BindingResult bindingResult, Model model,Authentication authentication){
+                          BindingResult bindingResult){
             if (bindingResult.hasErrors()) {
                 return "shop/add-shop";
             }
-               User currentUser = userService.findUserByUsername(authentication.getName());
-                shopService.saveShop(shopForm,currentUser);
+                shopService.saveShop(shopForm);
 
 
             return "redirect:/shop";
         }
 
+
+        //TODO перенести валидация в сервис
         @GetMapping("/editShop")
-        public String editShop (@RequestParam("shopId") int shopId, Model model,Authentication authentication){
-                User currentUser = userService.findUserByUsername(authentication.getName());
-            model.addAttribute("currentUser",currentUser);
+        public String editShop (@RequestParam("shopId") int shopId, Model model){
+                User currentUser = SecurityContext.getCurrentUser();
             if(shopService.getShopDetails(shopId).getOwner() == currentUser
                     || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
                 Organization currentShop = shopService.getShopDetails(shopId);
@@ -88,11 +86,8 @@ public class ShopController {
         }
 
         @GetMapping("/viewShop")
-        public String viewShop(@RequestParam("shopId") int id,Model model,Authentication authentication){
-                User currentUser = userService.findUserByUsername(authentication.getName());
-            model.addAttribute("currentUser",currentUser);
+        public String viewShop(@RequestParam("shopId") int id,Model model){
             model.addAttribute("currentShop",shopService.getShopDetails(id));
-            System.out.println(currentUser.getAuthorities().toString());
             return "shop/details";
 
         }

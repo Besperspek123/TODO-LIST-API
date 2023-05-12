@@ -39,13 +39,13 @@ public class CartController {
             redirectAttributes.addAttribute("cartProductError","В магазине нет товара");
             return "redirect:/main";
         }
-        if(!cartProductService.checkAvailability(currentUser,productForAddToCart)){
+        if(!cartService.checkAvailability(productForAddToCart)){
             redirectAttributes.addAttribute("cartProductError","Вы не можете добавить в корзину такое количество" +
                     "товара, которого нет в магазине");
                     return "redirect:/main";
         }
 
-        cartProductService.saveCartProduct(currentUser,productForAddToCart);
+        cartService.addProductToCart(productForAddToCart);
 
 
 
@@ -55,21 +55,14 @@ public class CartController {
     }
 
     @PostMapping("/deleteFromCart")
-    public String deleteFromCart(@RequestParam("productId") int productId,Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        cartService.deleteProductInCart(currentUser, productId);
-
-
-
-
+    public String deleteFromCart(@RequestParam("productId") int productId){
+        cartService.deleteProductInCart(productId);
         return "redirect:/cart";
     }
 
 
     @GetMapping("/cart")
-    public String cartDetails(Model model,Authentication authentication){
-        User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
+    public String cartDetails(Model model){
         return "cart/details";
     }
 

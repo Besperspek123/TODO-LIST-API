@@ -20,7 +20,6 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
-    @JsonIgnore
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Organization> organizationList = new ArrayList<>();
 
@@ -30,14 +29,12 @@ public class User implements UserDetails {
     @Column(name = "activity")
     private Boolean activity;
 
-    @JsonIgnore
     @Column(name = "password")
     private String password;
 
     @OneToOne
     private Cart cart;
 
-    @JsonIgnore
     @Transient
     private String passwordConfirm;
 
@@ -52,8 +49,7 @@ public class User implements UserDetails {
     @Column(name = "balance")
     private long Balance;
 
-    @JsonIgnore
-    @OneToMany(mappedBy = "customer")
+    @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
     private List<Order> orderList = new ArrayList<>();
 
     @Override

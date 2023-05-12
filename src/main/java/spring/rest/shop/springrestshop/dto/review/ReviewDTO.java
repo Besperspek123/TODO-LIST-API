@@ -7,7 +7,6 @@ import spring.rest.shop.springrestshop.entity.Review;
 import java.time.LocalDate;
 
 @Data
-@NoArgsConstructor
 public class ReviewDTO {
     private long id;
     private long ownerId;
@@ -16,12 +15,11 @@ public class ReviewDTO {
     private LocalDate date;
 
     public ReviewDTO (Review review){
-        ReviewDTO reviewDTO = new ReviewDTO();
-        reviewDTO.setId(review.getReviewId());
-        reviewDTO.setOwnerId(review.getAuthor().getId());
-        reviewDTO.setRating(review.getRating());
-        reviewDTO.setMessage(review.getComment());
-        reviewDTO.setDate(review.getDateCreated());
+        this.id = review.getReviewId();
+        this.ownerId = review.getAuthor().getId();
+        this.rating = review.getRating();
+        this.message = review.getComment();
+        this.date = review.getDateCreated();
     }
 
 }

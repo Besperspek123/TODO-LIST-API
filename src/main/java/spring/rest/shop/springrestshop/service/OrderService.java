@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.dto.order.OrderDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.repository.CartProductRepository;
 import spring.rest.shop.springrestshop.repository.CartRepository;
@@ -28,25 +30,25 @@ public class OrderService {
     private final UserRepository userRepository;
 
 
-    public void createOrder(User currentUser,Cart cart){
-        if(currentUser == cart.getBuyer()){
-            Order order = new Order();
-            order.setCustomer(currentUser);
-            List<CartProduct> cartProductList = new ArrayList<>(cart.getCartProducts()) ;
-            order.setProductList(cartProductList);
-            order.setPrice(cart.getCostPurchase());
+    public void createOrder() {
+        User currentUser = SecurityContext.getCurrentUser();
+        Cart cart = currentUser.getCart();
 
-            for (CartProduct cartProduct:cart.getCartProducts()
-                 ) {
-                cartProduct.getOrdersList().add(order);
-                cartProduct.setCart(null);
-                cartProductRepository.save(cartProduct);
-            }
+        Order order = new Order();
+        order.setCustomer(currentUser);
+        List<CartProduct> cartProductList = new ArrayList<>(cart.getCartProducts());
+        order.setProductList(cartProductList);
+        order.setPrice(cart.getCostPurchase());
 
-            orderRepository.save(order);
-            cart.setCartProducts(new ArrayList<>());
-            cartService.calculateTotalCost(cart);
+        for (CartProduct cartProduct : cartProductList) {
+            cartProduct.setCart(null);
+            cartProductRepository.save(cartProduct);
         }
+
+        orderRepository.save(order);
+        cart.setCartProducts(new ArrayList<>());
+        cart.setCostPurchase(0);
+        cartService.saveCart(cart);
     }
 
     public Order getOrderDetails(User currentUser,long orderId){
@@ -59,5 +61,9 @@ public class OrderService {
     }
 
 
+    public List<Order> getOrdersForCurrentUser() {
+        User currentUser = SecurityContext.getCurrentUser();
+       return orderRepository.findByCustomer_Id(currentUser.getId());
+    }
 }
 

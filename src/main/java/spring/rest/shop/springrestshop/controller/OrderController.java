@@ -35,7 +35,7 @@ public class OrderController {
         User currentUser = SecurityContext.getCurrentUser();
         Cart currentCart = currentUser.getCart();
         if(currentCart.getCartProducts().size() != 0){
-            orderService.createOrder(currentUser,currentCart);
+            orderService.createOrder();
         }
 
         else redirectAttributes.addAttribute("orderIsEmpty", "true");

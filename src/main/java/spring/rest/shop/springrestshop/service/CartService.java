@@ -31,11 +31,6 @@ public class CartService  {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public void saveCart(Cart cart){
-        int pricePurchase = 0;
-        for (CartProduct cartProduct:cart.getCartProducts()) {
-            pricePurchase += cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
-        }
-        cart.setCostPurchase(pricePurchase);
         cartRepository.save(cart);
     }
 

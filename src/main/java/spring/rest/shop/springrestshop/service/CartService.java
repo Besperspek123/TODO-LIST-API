@@ -34,7 +34,6 @@ public class CartService  {
         cartRepository.save(cart);
     }
 
-    //TODO перенести туда метод который добавляет товар в корзинну
     public void addProductToCart(Product product){
         User currentUser = SecurityContext.getCurrentUser();
         Cart currentCart = currentUser.getCart();
@@ -132,7 +131,7 @@ public class CartService  {
         int totalCost = 0;
             for (CartProduct cartProduct:cart.getCartProducts()
                  ) {
-                totalCost += (int) cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
+                totalCost += cartProduct.getProduct().getPrice() * cartProduct.getQuantity();
             }
             cart.setCostPurchase(totalCost);
             System.out.println("В корзину сохранятеся сумма " + totalCost);

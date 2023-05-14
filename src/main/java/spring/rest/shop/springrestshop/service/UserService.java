@@ -41,14 +41,29 @@ public class UserService implements UserDetailsService {
         return JwtEntityFactory.create(user);
 
     }
-    public boolean checkIfUserExistsByUsername(String username){
-        if(userRepository.findByUsername(username) == null){
+    public boolean checkIfUserExistsByUsername(User user){
+        if(user.getId() == null){
+            if (userRepository.findByUsername(user.getUsername()) == null){
+                return false;
+            }
+
+        }
+        else if (user.getUsername().equals(userRepository.findById((long) user.getId()).getUsername()) ||
+                !user.getUsername().equals(userRepository.findById((long) user.getId()).getUsername())
+                && userRepository.findByUsername(user.getUsername()) == null){
             return false;
         }
         return true;
     }
-    public boolean checkIfUserExistsByEmail(String email){
-        if(userRepository.findByEmail(email) == null){
+    public boolean checkIfUserExistsByEmail(User user){
+        if(user.getId() == null){
+            if(userRepository.findByEmail(user.getEmail()) == null){
+                return false;
+            }
+        }
+        else if(user.getEmail().equals(userRepository.findById((long) user.getId()).getEmail())
+                || !user.getEmail().equals(userRepository.findById((long) user.getId()).getEmail())
+                && userRepository.findByEmail(user.getEmail()) == null){
             return false;
         }
         return true;
@@ -70,35 +85,37 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
-//TODO когда админ меняет пользователя, нельзя оставить ту же почту ибо он думает, что пользователь регистрирует новый акк
-    public boolean saveUser(User user) {
-        if(userRepository.findByUsername(user.getUsername())==null
-                && userRepository.findByEmail(user.getEmail())==null
-                || userRepository.findByUsername(user.getUsername())!=null && user.getId() != null){
-            if(user.getPassword() != null){
-                user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+    public void editUser(User user) {
+            if(user.getPassword() == null){
+                user.setPassword(userRepository.findById((long) user.getId()).getPassword());
             }
+            else user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setActivity(true);
+            user.setCart(userRepository.findById((long) user.getId()).getCart());
+            user.setPasswordConfirm("");
 
+
+        userRepository.save(user); // сохраняем пользователя
+        log.info("Saving new User with username: {}", user.getUsername());
+    }
+    public void saveNewUser(User user) {
+        if(user.getId() == null)
+        {
+            user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+            user.setActivity(true);
             user.getRoles().add(Role.ROLE_USER);
-            if (user.getActivity() == null){
-                user.setActivity(true);
-            }
             if (user.getUsername().equals("admin")){
                 user.getRoles().add(Role.ROLE_ADMIN);
             }
-            if(user.getCart() == null){
-                Cart cart = new Cart();
-                cartRepository.save(cart); // сохраняем корзину
-                cart.setBuyer(user);
-                user.setCart(cart);
-            }
-
+            Cart cart =new Cart();
+            cartRepository.save(cart);
+            cart.setBuyer(user);
+            user.setCart(cart);
             user.setPasswordConfirm("");
-            userRepository.save(user); // сохраняем пользователя
-            log.info("Saving new User with username: {}", user.getUsername());
-            return true;
         }
-       return false;
+
+        userRepository.save(user); // сохраняем пользователя
+        log.info("Saving new User with username: {}", user.getUsername());
     }
     public void banUser(User userForBan){
         User currentUser = SecurityContext.getCurrentUser();

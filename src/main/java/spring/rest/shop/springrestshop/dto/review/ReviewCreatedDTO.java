@@ -5,7 +5,7 @@ import spring.rest.shop.springrestshop.entity.Review;
 
 @Data
 public class ReviewCreatedDTO {
-    private int rating;
+    private Integer rating;
     private String message;
 
 }

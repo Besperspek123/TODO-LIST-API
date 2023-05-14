@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
 
@@ -133,7 +134,7 @@ public class AdminController {
     }
 
     @PostMapping("/disapproveAllShops")
-    public String disapproveAllShops(Authentication authentication){
+    public String disapproveAllShops(Authentication authentication) throws EntityNotFoundException {
         shopService.disapproveAllShops(userService.findUserByUsername(authentication.getName()));
         return "redirect:/admin/moderation";
     }
@@ -144,7 +145,7 @@ public class AdminController {
         return "redirect:/admin/moderation";
     }
     @PostMapping("/deleteShop")
-    public String deleteShop(@RequestParam(name = "shopId")long shopId,Authentication authentication){
+    public String deleteShop(@RequestParam(name = "shopId")long shopId,Authentication authentication) throws EntityNotFoundException {
         User currentUser = userService.findUserByUsername(authentication.getName());
         shopService.deleteShop((int)shopId,currentUser);
         return "redirect:/admin/shops";

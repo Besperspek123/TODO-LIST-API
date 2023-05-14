@@ -8,10 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
-import spring.rest.shop.springrestshop.exception.PermissionForSaveThisProductDeniedException;
-import spring.rest.shop.springrestshop.exception.UnauthorizedShopAccessException;
-import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
-import spring.rest.shop.springrestshop.exception.UserBannedException;
+import spring.rest.shop.springrestshop.exception.*;
 
 @ControllerAdvice
 public class ExceptionHandlerController {
@@ -29,6 +26,10 @@ public class ExceptionHandlerController {
         UserIncorrectData data = new UserIncorrectData();
         data.setInfo(exception.getMessage());
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler
+    public ResponseEntity<String> userTryGetEntityThatDoesNotExist(EntityNotFoundException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler

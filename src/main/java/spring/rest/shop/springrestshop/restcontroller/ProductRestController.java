@@ -8,6 +8,7 @@ import spring.rest.shop.springrestshop.dto.product.ProductDTO;
 import spring.rest.shop.springrestshop.dto.product.ProductDetailsDTO;
 import spring.rest.shop.springrestshop.dto.review.ReviewCreatedDTO;
 import spring.rest.shop.springrestshop.entity.Product;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ReviewService;
 import spring.rest.shop.springrestshop.service.ShopService;
@@ -32,7 +33,7 @@ public class ProductRestController {
 
     @PostMapping("/products/{productId}/reviews")
     public ResponseEntity<String> addReview(@PathVariable long productId, @RequestBody ReviewCreatedDTO review){
-        reviewService.addReview(review,productId);
+        reviewService.addNewReview(review,productId);
         return new ResponseEntity<>("Your review add",HttpStatus.ACCEPTED);
     }
 
@@ -53,8 +54,8 @@ public class ProductRestController {
 
 
     @PutMapping("/products/{productId}")
-    public ResponseEntity<String> editProduct(@PathVariable long productId,@RequestBody Product product){
-        productService.save(product);
-        return new ResponseEntity<>("product with id "+ productId + " has been edited",HttpStatus.ACCEPTED);
+    public ProductDetailsDTO editProduct(@PathVariable long productId,@RequestBody Product product) throws EntityNotFoundException {
+        productService.editProduct(productId,product);
+        return new ProductDetailsDTO(productService.getProductDetails(productId));
     }
 }

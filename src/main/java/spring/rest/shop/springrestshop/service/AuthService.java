@@ -46,7 +46,7 @@ public class AuthService {
         userForRegistration.setPassword(user.getPassword());
         userForRegistration.setPasswordConfirm(user.getConfirmPassword());
         userForRegistration.setEmail(user.getEmail());
-        userService.saveUser(userForRegistration);
+        userService.saveNewUser(userForRegistration);
 
     }
 }

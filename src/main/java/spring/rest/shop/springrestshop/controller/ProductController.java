@@ -50,7 +50,7 @@ public class ProductController {
             User currentUser = SecurityContext.getCurrentUser();
             if(productForm.getId() != 0){
                 if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
-                        || currentUser == productService.getProductDetails((int)productForm.getId()).getOrganization().getOwner()){
+                        || currentUser == productService.getProductDetails(productForm.getId()).getOrganization().getOwner()){
                     productService.addProduct(productForm, shopId);
                 }
                 else try {

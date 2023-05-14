@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -61,7 +62,6 @@ public class ShopController {
         }
 
 
-        //TODO перенести валидация в сервис
         @GetMapping("/editShop")
         public String editShop (@RequestParam("shopId") int shopId, Model model){
                 User currentUser = SecurityContext.getCurrentUser();
@@ -74,8 +74,7 @@ public class ShopController {
                 return "shop/add-shop";
         }
         @PostMapping("/deleteShop")
-        public String deleteShop(@RequestParam("shopId") int shopId,Model model,Authentication authentication)
-        {
+        public String deleteShop(@RequestParam("shopId") int shopId,Model model,Authentication authentication) throws EntityNotFoundException {
             User currentUser = userService.findUserByUsername(authentication.getName());
             if(shopService.getShopDetails(shopId).getOwner() == currentUser
                     || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){

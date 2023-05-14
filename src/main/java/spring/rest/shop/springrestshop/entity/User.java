@@ -20,24 +20,28 @@ public class User implements UserDetails {
     @Column(name = "id")
     private Long id;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "owner",cascade = CascadeType.ALL)
     private List<Organization> organizationList = new ArrayList<>();
 
     @Column(name = "username")
     private String username;
 
+    @JsonIgnore
     @Column(name = "activity")
     private Boolean activity;
 
     @Column(name = "password")
     private String password;
 
+    @JsonIgnore
     @OneToOne
     private Cart cart;
 
     @Transient
     private String passwordConfirm;
 
+    @JsonIgnore
     @CollectionTable(name = "user_role",joinColumns = @JoinColumn(name = "user_id"))
     @ElementCollection(targetClass = Role.class,fetch = FetchType.EAGER)
     @Enumerated(EnumType.STRING)
@@ -46,9 +50,11 @@ public class User implements UserDetails {
     @Column(name = "email")
     private String email;
 
+    @JsonIgnore
     @Column(name = "balance")
     private long Balance;
 
+    @JsonIgnore
     @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
     private List<Order> orderList = new ArrayList<>();
 

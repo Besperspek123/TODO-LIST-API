@@ -52,27 +52,47 @@ public class UserController {
 
 
 
-        if (bindingResult.hasErrors()) {
-            return "registration";
-        }
         if (!userForm.getPassword().equals(userForm.getPasswordConfirm())){
             model.addAttribute("passwordError", "Пароли не совпадают");
-            return "registration";
+            if(userForm.getId() == null){
+                return "registration";
+            }
+            else {
+                model.addAttribute("userForm",userForm);
+                return "admin/edit-user";
+            }
         }
-        if (userService.checkIfUserExistsByUsername(userForm.getUsername())){
+        if (userService.checkIfUserExistsByUsername(userForm)){
             model.addAttribute("usernameError", "Пользователь с таким именем уже существует");
-            return "registration";
+            if(userForm.getId() == null){
+                return "registration";
+            }
+            else {
+                model.addAttribute("userForm",userForm);
+                return "admin/edit-user";
+            }
         }
-        if (userService.checkIfUserExistsByEmail(userForm.getEmail())){
+        if (userService.checkIfUserExistsByEmail(userForm)){
             model.addAttribute("emailError", "Пользователь с такой почтой уже существует");
-            return "registration";
+            if(userForm.getId() == null){
+                return "registration";
+            }
+            else {
+                model.addAttribute("userForm",userForm);
+                return "admin/edit-user";
+            }
         }
-
-        userService.saveUser(userForm);
-
-
-        redirectAttributes.addAttribute("success", "true");
-        return "redirect:/login";
+        boolean isNewUser = userForm.getId() == null;
+        if (isNewUser){
+            userService.saveNewUser(userForm);
+            redirectAttributes.addAttribute("success", "true");
+            return "redirect:/login";
+        }
+        else {
+            userService.editUser(userForm);
+            redirectAttributes.addAttribute("success", "true");
+            return "redirect:/admin/users";
+        }
     }
 
     @GetMapping("/users")

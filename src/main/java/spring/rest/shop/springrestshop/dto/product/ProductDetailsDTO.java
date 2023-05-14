@@ -33,6 +33,7 @@ public class ProductDetailsDTO {
         this.price = product.getPrice();
         this.amount = product.getAmountInStore();
         this.sale = product.getSale();
+        this.description = product.getDescription();
         this.review = product.getReviewsList().stream().map(ReviewDTO::new).collect(Collectors.toList());
         this.keywords = product.getKeywordsString();
         this.characteristics = product.getCharacteristicsString();

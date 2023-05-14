@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.*;
 
 import java.util.ArrayList;
@@ -64,7 +65,7 @@ public class ShopService {
         return shopRepository.getAllByNameContainingAndActivityIsTrue(string);
     }
 
-    public void deleteShop(long shopId, User user) {
+    public void deleteShop(long shopId, User user) throws EntityNotFoundException {
         if(shopRepository.getOrganizationById(shopId).getOwner() == user
                 || user.getRoles().contains(Role.ROLE_ADMIN)){
             List<Product> productListForDeletedShop = productService.getProductsFromShop(shopId);
@@ -122,7 +123,7 @@ public class ShopService {
             shopRepository.save(shop);
         }
     }
-    public void disapproveAllShops(User currentUser){
+    public void disapproveAllShops(User currentUser) throws EntityNotFoundException {
         List<Organization> shopList = shopRepository.getAllByActivityIsFalse();
         for (Organization shop:shopList
         ) {

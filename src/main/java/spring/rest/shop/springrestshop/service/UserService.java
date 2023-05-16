@@ -3,6 +3,7 @@ package spring.rest.shop.springrestshop.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -12,7 +13,7 @@ import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
-import spring.rest.shop.springrestshop.exception.PermissionForBanAndUnbanUserDeniedException;
+import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
 import spring.rest.shop.springrestshop.repository.*;
 
@@ -89,7 +90,8 @@ public class UserService implements UserDetailsService {
             if(user.getPassword() == null){
                 user.setPassword(userRepository.findById((long) user.getId()).getPassword());
             }
-            else user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                else user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+
             user.setActivity(true);
             user.setCart(userRepository.findById((long) user.getId()).getCart());
             user.setPasswordConfirm("");
@@ -97,6 +99,29 @@ public class UserService implements UserDetailsService {
 
         userRepository.save(user); // сохраняем пользователя
         log.info("Saving new User with username: {}", user.getUsername());
+    }
+    public void editUser(long userId, User editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
+        if(userRepository.findById(userId) == null){
+            throw new EntityNotFoundException("Username with ID " + userId + " not found");
+        }
+        User user = userRepository.findById(userId);
+        if(editUser.getUsername() != null){
+            if(userRepository.findByUsername(editUser.getUsername()) != null){
+                throw new UserAlreadyRegisteredException("Username: "+ editUser.getUsername() +" already exist");
+            }
+            user.setUsername(editUser.getUsername());
+        }
+        if(editUser.getEmail() != null){
+            if(userRepository.findByEmail(editUser.getEmail()) != null){
+                throw new UserAlreadyRegisteredException("Email: " + editUser.getEmail() + " already exist");
+            }
+            user.setEmail(editUser.getEmail());
+        }
+        if(editUser.getPassword() != null){
+            user.setPassword(editUser.getPassword());
+        }
+
+        userRepository.save(user);
     }
     public void saveNewUser(User user) {
         if(user.getId() == null)
@@ -117,8 +142,11 @@ public class UserService implements UserDetailsService {
         userRepository.save(user); // сохраняем пользователя
         log.info("Saving new User with username: {}", user.getUsername());
     }
-    public void banUser(User userForBan){
+    public void banUser(User userForBan) throws UserAlreadyBannedException {
         User currentUser = SecurityContext.getCurrentUser();
+        if(!userForBan.getActivity()){
+            throw new UserAlreadyBannedException("User with username: " + userForBan.getUsername() + "already banned");
+        }
         try {
             if(currentUser.getRoles().contains(Role.ROLE_ADMIN) && !userForBan.getRoles().contains(Role.ROLE_ADMIN)){
                 userForBan.setActivity(false);
@@ -132,8 +160,11 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void unbanUser(User userForUnban){
+    public void unbanUser(User userForUnban) throws UserNotBannedException {
         User currentUser = SecurityContext.getCurrentUser();
+        if(userForUnban.getActivity()){
+            throw new UserNotBannedException("User with username: " + userForUnban.getUsername() + "is not banned");
+        }
         try {
             if(currentUser.getRoles().contains(Role.ROLE_ADMIN)){
                 userForUnban.setActivity(true);
@@ -147,7 +178,10 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void addBalance(User user, int deposit) {
+    public void addBalance(User user, long deposit) {
+        if(!SecurityContext.getCurrentUser().getRoles().contains(Role.ROLE_ADMIN)){
+            throw new AccessDeniedException("You don`t have permission");
+        }
         user.setBalance(user.getBalance() + deposit);
         userRepository.save(user);
     }

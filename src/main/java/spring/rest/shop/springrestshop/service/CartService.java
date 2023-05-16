@@ -45,6 +45,11 @@ public class CartService  {
 
         }
 
+        public Cart getCartForCurrentUser(){
+        User user = SecurityContext.getCurrentUser();
+        return cartRepository.findByBuyer(user);
+        }
+
     private void saveCartProductIfHeDontHaveInCart(Product product) {
         User currentUser = SecurityContext.getCurrentUser();
         Cart cart = currentUser.getCart();

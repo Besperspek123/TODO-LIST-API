@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.exception.PermissionForSaveThisProductDeniedException;
 import spring.rest.shop.springrestshop.exception.UnauthorizedShopAccessException;
 import spring.rest.shop.springrestshop.repository.ProductRepository;
@@ -46,7 +47,7 @@ public class ProductController {
         //TODO пересмотреть валидация и отправить её в сервис
         @PostMapping("/addProduct")
         public String addProductForCurrentShop(@ModelAttribute("productForm") @Validated Product productForm,
-        @RequestParam ("shopId") int shopId) throws UnauthorizedShopAccessException {
+        @RequestParam ("shopId") int shopId) throws UnauthorizedShopAccessException, EntityNotFoundException {
             User currentUser = SecurityContext.getCurrentUser();
             if(productForm.getId() != 0){
                 if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
@@ -64,14 +65,14 @@ public class ProductController {
         }
 
         @GetMapping("/editProduct")
-        public String editProduct(@RequestParam("shopId") int shopId,@RequestParam("productId") int productId, Model model) {
+        public String editProduct(@RequestParam("shopId") int shopId,@RequestParam("productId") int productId, Model model) throws EntityNotFoundException {
             model.addAttribute("productForm", productService.getProductDetails(productId));
             model.addAttribute("shopId",shopId);
             return "product/add-product";
         }
 
         @PostMapping("/deleteProduct")
-        public String deleteProduct(@RequestParam("productId") long productId){
+        public String deleteProduct(@RequestParam("productId") long productId) throws EntityNotFoundException {
             Product product = productService.getProductDetails(productId);
             long shopId = product.getOrganization().getId();
                 productService.deleteProductInShop(product.getId());
@@ -80,7 +81,7 @@ public class ProductController {
 
 
         @GetMapping("/viewProduct")
-        public String viewProduct(@RequestParam("productId") int productId, Model model){
+        public String viewProduct(@RequestParam("productId") int productId, Model model) throws EntityNotFoundException {
         model.addAttribute(productService.getProductDetails(productId));
         return "product/details";
         }

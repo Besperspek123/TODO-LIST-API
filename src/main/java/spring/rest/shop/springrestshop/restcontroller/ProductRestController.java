@@ -32,13 +32,13 @@ public class ProductRestController {
 
 
     @PostMapping("/products/{productId}/reviews")
-    public ResponseEntity<String> addReview(@PathVariable long productId, @RequestBody ReviewCreatedDTO review){
+    public ResponseEntity<String> addReview(@PathVariable long productId, @RequestBody ReviewCreatedDTO review) throws EntityNotFoundException {
         reviewService.addNewReview(review,productId);
         return new ResponseEntity<>("Your review add",HttpStatus.ACCEPTED);
     }
 
     @GetMapping("/products/{productId}")
-    public ProductDetailsDTO getProductDetails(@PathVariable long productId){
+    public ProductDetailsDTO getProductDetails(@PathVariable long productId) throws EntityNotFoundException {
         Product product = productService.getProductDetails(productId);
 
         return new ProductDetailsDTO(product);

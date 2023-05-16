@@ -97,15 +97,7 @@ public class SecurityConfig {
     }
 
 
-
-//    @Bean
-//    public JdbcUserDetailsManager userDetailsService(DataSource dataSource) {
-//        JdbcUserDetailsManager detailsManager = new JdbcUserDetailsManager(dataSource);
-//        detailsManager.setUsersByUsernameQuery("select username, password, activity from users where username=?");
-//        detailsManager.setAuthoritiesByUsernameQuery("select roles from user_role where user_id=?");
-//        return detailsManager;
-//    }
-
+    
 
     @Bean
     public DaoAuthenticationProvider authenticationProvider() {

@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.dto.shop.ShopDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.*;
@@ -53,7 +54,21 @@ public class ShopService {
         }
     }
 
-    public Organization getShopDetails(int id){
+    public void editShop(long shopId, Organization shopForEdit) throws EntityNotFoundException {
+        if(shopRepository.getOrganizationById(shopId) == null) {
+            throw new EntityNotFoundException("Shop with ID: " + shopId);
+        }
+        Organization shop = shopRepository.getOrganizationById(shopId);
+        if(shopForEdit.getName() != null){
+            shop.setName(shopForEdit.getName());
+        }
+        if(shopForEdit.getDescription() != null){
+            shop.setDescription(shopForEdit.getDescription());
+        }
+        shopRepository.save(shop);
+    }
+
+    public Organization getShopDetails(long id){
         return shopRepository.getOrganizationById(id);
     }
 
@@ -65,9 +80,10 @@ public class ShopService {
         return shopRepository.getAllByNameContainingAndActivityIsTrue(string);
     }
 
-    public void deleteShop(long shopId, User user) throws EntityNotFoundException {
-        if(shopRepository.getOrganizationById(shopId).getOwner() == user
-                || user.getRoles().contains(Role.ROLE_ADMIN)){
+    public void deleteShop(long shopId) throws EntityNotFoundException {
+        User currentUser = SecurityContext.getCurrentUser();
+        if(shopRepository.getOrganizationById(shopId).getOwner() == currentUser
+                || currentUser.getRoles().contains(Role.ROLE_ADMIN)){
             List<Product> productListForDeletedShop = productService.getProductsFromShop(shopId);
             for (Product product:productListForDeletedShop
             ) {
@@ -127,7 +143,7 @@ public class ShopService {
         List<Organization> shopList = shopRepository.getAllByActivityIsFalse();
         for (Organization shop:shopList
         ) {
-            deleteShop(shop.getId(),currentUser);
+            deleteShop(shop.getId());
 
         }
     }

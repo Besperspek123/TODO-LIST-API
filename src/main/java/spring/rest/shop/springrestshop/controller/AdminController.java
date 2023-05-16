@@ -13,6 +13,8 @@ import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
+import spring.rest.shop.springrestshop.exception.UserAlreadyBannedException;
+import spring.rest.shop.springrestshop.exception.UserNotBannedException;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
 
@@ -68,14 +70,14 @@ public class AdminController {
         return "admin/shops";
     }
     @PostMapping("/banUser")
-    public String banUser(@RequestParam(name = "userId")long userId,Authentication authentication){
+    public String banUser(@RequestParam(name = "userId")long userId,Authentication authentication) throws UserAlreadyBannedException {
         User userForBan = userService.getUserById(userId);
         User currentUser = userService.findUserByUsername(authentication.getName());
         userService.banUser(userForBan);
         return "redirect:/admin/userInfo?userId=" + userId;
     }
     @PostMapping("/unbanUser")
-    public String unbanUser(@RequestParam(name = "userId")long userId,Authentication authentication){
+    public String unbanUser(@RequestParam(name = "userId")long userId,Authentication authentication) throws UserNotBannedException {
         User userForUnban = userService.getUserById(userId);
         userService.unbanUser(userForUnban);
         return "redirect:/admin/userInfo?userId=" + userId;
@@ -147,7 +149,7 @@ public class AdminController {
     @PostMapping("/deleteShop")
     public String deleteShop(@RequestParam(name = "shopId")long shopId,Authentication authentication) throws EntityNotFoundException {
         User currentUser = userService.findUserByUsername(authentication.getName());
-        shopService.deleteShop((int)shopId,currentUser);
+        shopService.deleteShop(shopId);
         return "redirect:/admin/shops";
     }
 

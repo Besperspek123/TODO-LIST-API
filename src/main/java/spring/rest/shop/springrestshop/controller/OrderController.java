@@ -12,6 +12,7 @@ import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.CartEmptyException;
 import spring.rest.shop.springrestshop.service.*;
 
 @Controller
@@ -31,7 +32,7 @@ public class OrderController {
     private CartProductService cartProductService;
 
     @PostMapping("/createOrder")
-    public String createOrder(RedirectAttributes redirectAttributes){
+    public String createOrder(RedirectAttributes redirectAttributes) throws CartEmptyException {
         User currentUser = SecurityContext.getCurrentUser();
         Cart currentCart = currentUser.getCart();
         if(currentCart.getCartProducts().size() != 0){
@@ -54,7 +55,7 @@ public class OrderController {
     @GetMapping("/viewOrder")
     public String viewOrder(@RequestParam(name = "orderId") long orderId,Model model){
         User currentUser = SecurityContext.getCurrentUser();
-        Order order = orderService.getOrderDetails(currentUser,orderId);
+        Order order = orderService.getOrderDetails(orderId);
         model.addAttribute("order",order);
         return "order/details";
     }

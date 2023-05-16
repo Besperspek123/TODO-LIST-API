@@ -28,7 +28,7 @@ public class ReviewService {
         return reviewList.stream().map(ReviewDTO::new).collect(Collectors.toList());
     }
 
-    public void addNewReview(ReviewCreatedDTO review, long productId){
+    public void addNewReview(ReviewCreatedDTO review, long productId) throws EntityNotFoundException {
         User currentUser = SecurityContext.getCurrentUser();
         if(!isUserBuyThisProduct(productId)) {
             throw new AccessDeniedException("You can't add a review about a product you didn't buy");

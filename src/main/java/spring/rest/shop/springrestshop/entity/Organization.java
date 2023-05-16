@@ -24,19 +24,23 @@ public class Organization {
     @Column(name = "description")
     private String description;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User owner;
 
+    @JsonIgnore
     @Column(name = "activity")
     private boolean activity;
 
 
+    @JsonIgnore
     @OneToMany(mappedBy = "organization")
     private List<Product> productList;
 
 
 
+    @JsonIgnore
     private ImageIcon logotype;
 
     @Override

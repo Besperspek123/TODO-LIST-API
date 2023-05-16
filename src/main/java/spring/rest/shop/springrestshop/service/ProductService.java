@@ -43,8 +43,13 @@ public class ProductService {
         return productRepository.findByOrganization_Id(shopId);
     }
 
-    public Product getProductDetails(long id){
-        return productRepository.getById(id);
+    public Product getProductDetails(long id) throws EntityNotFoundException {
+        Product product = productRepository.getById(id);
+        if(product == null){
+            throw new EntityNotFoundException("Product with ID: " + id + " not found");
+        }
+        return product;
+
     }
 
     public void addProduct(Product product, long shopId) throws UnauthorizedShopAccessException {

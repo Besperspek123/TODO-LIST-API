@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.order.OrderDTO;
 import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.exception.CartEmptyException;
 import spring.rest.shop.springrestshop.repository.CartProductRepository;
 import spring.rest.shop.springrestshop.repository.CartRepository;
 import spring.rest.shop.springrestshop.repository.OrderRepository;
@@ -30,10 +31,12 @@ public class OrderService {
     private final UserRepository userRepository;
 
 
-    public void createOrder() {
+    public void createOrder() throws CartEmptyException {
         User currentUser = SecurityContext.getCurrentUser();
         Cart cart = currentUser.getCart();
-
+        if(cart.getCartProducts().isEmpty()){
+            throw new CartEmptyException("Cart is empty");
+        }
         Order order = new Order();
         order.setCustomer(currentUser);
         List<CartProduct> cartProductList = new ArrayList<>(cart.getCartProducts());
@@ -51,8 +54,8 @@ public class OrderService {
         cartService.saveCart(cart);
     }
 
-    public Order getOrderDetails(User currentUser,long orderId){
-
+    public Order getOrderDetails(long orderId){
+        User currentUser = SecurityContext.getCurrentUser();
         Order order = orderRepository.findById(orderId);
         if(order.getCustomer() == currentUser || currentUser.getRoles().contains(Role.ROLE_ADMIN)){
             return order;

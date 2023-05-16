@@ -11,6 +11,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.service.CartProductService;
 import spring.rest.shop.springrestshop.service.CartService;
 import spring.rest.shop.springrestshop.service.ProductService;
@@ -30,7 +31,7 @@ public class CartController {
     private CartProductService cartProductService;
 
     @PostMapping("/addToCart")
-    public String addProductToCart(@RequestParam("productId") int productId, Model model, Authentication authentication, RedirectAttributes redirectAttributes){
+    public String addProductToCart(@RequestParam("productId") int productId, Model model, Authentication authentication, RedirectAttributes redirectAttributes) throws EntityNotFoundException {
         User currentUser = userService.findUserByUsername(authentication.getName());
         Product productForAddToCart = productService.getProductDetails(productId);
 

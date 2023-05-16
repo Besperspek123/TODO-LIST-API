@@ -28,6 +28,25 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
     }
     @ExceptionHandler
+    public ResponseEntity<UserIncorrectData> userAlreadyBannedException(UserAlreadyBannedException exception){
+        UserIncorrectData data = new UserIncorrectData();
+        data.setInfo(exception.getMessage());
+        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler
+    public ResponseEntity<UserIncorrectData> userNotBanned(UserNotBannedException exception){
+        UserIncorrectData data = new UserIncorrectData();
+        data.setInfo(exception.getMessage());
+        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler
+    public ResponseEntity<UserIncorrectData> cartEmpty(CartEmptyException exception){
+        UserIncorrectData data = new UserIncorrectData();
+        data.setInfo(exception.getMessage());
+        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler
     public ResponseEntity<String> userTryGetEntityThatDoesNotExist(EntityNotFoundException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }

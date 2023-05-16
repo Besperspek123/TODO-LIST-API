@@ -1,10 +1,11 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 import spring.rest.shop.springrestshop.dto.order.OrderDTO;
+import spring.rest.shop.springrestshop.exception.CartEmptyException;
 import spring.rest.shop.springrestshop.service.OrderService;
 
 import java.util.List;
@@ -22,6 +23,17 @@ public class OrdersRestController {
         return orderService.getOrdersForCurrentUser().stream().map(OrderDTO::new).collect(Collectors.toList());
 
     }
+    @GetMapping("/orders/{orderId}")
+    public OrderDTO getOrderDetails(@PathVariable long orderId){
+        return new OrderDTO(orderService.getOrderDetails(orderId));
+
+    }
+    @PostMapping("/orders")
+    public ResponseEntity<String> createOrder() throws CartEmptyException {
+        orderService.createOrder();
+        return new ResponseEntity<>("Order created", HttpStatus.ACCEPTED);
+    }
+
 
 
 }

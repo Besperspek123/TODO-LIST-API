@@ -78,7 +78,7 @@ public class ShopController {
             User currentUser = userService.findUserByUsername(authentication.getName());
             if(shopService.getShopDetails(shopId).getOwner() == currentUser
                     || currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))){
-                shopService.deleteShop(shopId,currentUser);
+                shopService.deleteShop(shopId);
             }
 
             return"redirect:/shop" ;

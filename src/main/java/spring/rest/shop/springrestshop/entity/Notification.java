@@ -2,6 +2,7 @@ package spring.rest.shop.springrestshop.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import net.minidev.json.annotate.JsonIgnore;
 
 import java.util.Date;
 
@@ -17,6 +18,7 @@ public class Notification {
     @Column(name = "title")
     private String title;
 
+    @JsonIgnore
     @Column(name = "date")
     @Temporal(TemporalType.DATE)
     private Date date;
@@ -24,9 +26,13 @@ public class Notification {
     @Column(name = "message")
     private String message;
 
+    @JsonIgnore
+    @Column(name = "isRead")
+    boolean isRead;
+
+    @JsonIgnore
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User recipientUser;
-
 
 }

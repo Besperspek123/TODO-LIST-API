@@ -26,7 +26,7 @@ public class ShopRestController {
     private final ShopService shopService;
 
     @PostMapping("/shop/{shopId}")
-    public ProductDetailsDTO addProductToShop(@PathVariable long shopId, @RequestBody Product product) throws UnauthorizedShopAccessException {
+    public ProductDetailsDTO addProductToShop(@PathVariable long shopId, @RequestBody Product product) throws UnauthorizedShopAccessException, EntityNotFoundException {
         productService.addProduct(product,shopId);
         return new ProductDetailsDTO(product);
     }

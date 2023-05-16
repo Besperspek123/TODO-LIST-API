@@ -52,10 +52,14 @@ public class ProductService {
 
     }
 
-    public void addProduct(Product product, long shopId) throws UnauthorizedShopAccessException {
+    public void addProduct(Product product, long shopId) throws UnauthorizedShopAccessException, EntityNotFoundException {
         User currentUser = SecurityContext.getCurrentUser();
         System.out.println(currentUser.getUsername());
         Organization shop = shopRepository.getOrganizationById(shopId);
+
+        if (shop == null ){
+            throw new EntityNotFoundException("Shop with ID: " + shopId + " not found");
+        }
 
         if(!shop.getOwner().equals(currentUser)
         && currentUser.getRoles().stream().noneMatch(role -> role.name().equals("ROLE_ADMIN"))){

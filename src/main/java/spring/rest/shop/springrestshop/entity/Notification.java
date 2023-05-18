@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import net.minidev.json.annotate.JsonIgnore;
 
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -13,6 +14,7 @@ public class Notification {
 
     @Id
     @Column(name = "id")
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
     @Column(name = "title")
@@ -21,7 +23,7 @@ public class Notification {
     @JsonIgnore
     @Column(name = "date")
     @Temporal(TemporalType.DATE)
-    private Date date;
+    private LocalDate date;
 
     @Column(name = "message")
     private String message;

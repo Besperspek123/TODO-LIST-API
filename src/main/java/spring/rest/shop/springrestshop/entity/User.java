@@ -58,6 +58,10 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "customer",fetch = FetchType.EAGER)
     private List<Order> orderList = new ArrayList<>();
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "recipientUser",fetch = FetchType.EAGER)
+    private List<Notification> notificationList = new ArrayList<>();
+
     @Override
     public String getUsername(){
         return username;

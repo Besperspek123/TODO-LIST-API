@@ -50,6 +50,10 @@ public class ExceptionHandlerController {
     public ResponseEntity<String> userTryGetEntityThatDoesNotExist(EntityNotFoundException exception){
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
     }
+    @ExceptionHandler
+    public ResponseEntity<String> userTrySendNotificationMessageWithEmptyTitleOrMessage(EmptyFieldException exception){
+        return new ResponseEntity<>(exception.getMessage(), HttpStatus.NOT_FOUND);
+    }
 
     @ExceptionHandler
     public ResponseEntity<String> userTryAddProductInNotHerShop(UnauthorizedShopAccessException exception){

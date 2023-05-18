@@ -2,13 +2,18 @@ package spring.rest.shop.springrestshop.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.CartEmptyException;
+import spring.rest.shop.springrestshop.exception.EmptyFieldException;
+import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -27,6 +32,24 @@ public class NotificationService {
     public List<Notification> getAllNotificationForCurrentUser(){
         User currentUser = SecurityContext.getCurrentUser();
         return notificationRepository.findByRecipientUser(currentUser);
+    }
+
+    public void sendMessage(long userId,Notification notification) throws EntityNotFoundException, EmptyFieldException {
+        if(!SecurityContext.getCurrentUser().getRoles().contains(Role.ROLE_ADMIN)){
+            throw new AccessDeniedException("You don`t have role for this command");
+        }
+        if(userService.getUserById(userId) == null){
+            throw new EntityNotFoundException(("User with ID:" + userId + "not found"));
+        }
+        User recipientUSer = userService.getUserById(userId);
+        if(notification.getMessage() == null || notification.getTitle() == null){
+            throw new EmptyFieldException("Title and message fields cannot be empty");
+        }
+        notification.setDate(LocalDate.now());
+        notification.setRead(false);
+        notification.setRecipientUser(recipientUSer);
+        notificationRepository.save(notification);
+
     }
 
 }

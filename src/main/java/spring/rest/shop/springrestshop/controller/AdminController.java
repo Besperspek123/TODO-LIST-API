@@ -161,4 +161,6 @@ public class AdminController {
         model.addAttribute("currentUser",currentUser);
         return "admin/shops";
     }
+
+    //TODO: Реализовать метод который будет отправлять пользователю уведомление
 }

@@ -31,6 +31,12 @@ public class NotificationService {
 
     public List<Notification> getAllNotificationForCurrentUser(){
         User currentUser = SecurityContext.getCurrentUser();
+        List<Notification> notReadNotification = notificationRepository.getAllByRecipientUserAndIsReadFalse(currentUser);
+        for (Notification notification: notReadNotification
+             ) {
+            notification.setIsRead(true);
+            notificationRepository.save(notification);
+        }
         return notificationRepository.findByRecipientUser(currentUser);
     }
 
@@ -46,7 +52,7 @@ public class NotificationService {
             throw new EmptyFieldException("Title and message fields cannot be empty");
         }
         notification.setDate(LocalDate.now());
-        notification.setRead(false);
+        notification.setIsRead(false);
         notification.setRecipientUser(recipientUSer);
         notificationRepository.save(notification);
 

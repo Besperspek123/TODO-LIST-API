@@ -29,10 +29,12 @@
 
         <ul class="navbar-nav ms-auto">
 
-          <li style="margin-right: 30px" class="nav-item"><button class="notification" id="notification">
-            <a href="/notification">
+          <li style="margin-right: 30px" class="nav-item">
+            <button th:if="${currentUser.notificationList.?[isRead == false].size() > 0}" class="notification" id="notification">
+            <a href="/notifications">
               <img class="notification__image" src="/images/bell.png" alt="notification" />
-              <div class="notification__num" th:text="${currentUser.getCart().getCartProducts().size()}" id="notification_num"></div>
+              <div class="notification__num" th:text="${currentUser.notificationList.?[isRead == false].size()}" id="notification_num" th:unless="${#lists.isEmpty(currentUser.notificationList)}"></div>
+
             </a>
           </button></li>
 

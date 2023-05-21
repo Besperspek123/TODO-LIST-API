@@ -29,8 +29,8 @@ public class Notification {
     private String message;
 
     @JsonIgnore
-    @Column(name = "isRead")
-    boolean isRead;
+    @Column(name = "is_Read")
+    private Boolean isRead;
 
     @JsonIgnore
     @ManyToOne

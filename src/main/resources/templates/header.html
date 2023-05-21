@@ -1,6 +1,76 @@
 <html xmlns:th="http://www.thymeleaf.org">
 <body>
 <div th:fragment="content">
+  <style>
+
+    .cart {
+      width: 75px;
+      height: 75px;
+      border-radius: 50%;
+      background-color: #cccccc;
+      transition: 0.1s;
+      cursor: pointer;
+      position: fixed; /* Фиксированное расположение */
+      top: 63px; /* в правом верхнем углу */
+      right: 9px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      object-fit: contain;
+      padding: 15px;
+      box-shadow: 1px 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Увеличиваем кнопку при наведении на нее */
+    .cart:hover {
+      transform: scale(1.1);
+    }
+
+    /* Стилизуем счетчик товаров */
+    .cart__num {
+      position: absolute;
+      background-color: #d62240;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      color: #fff;
+      font-size: 18px;
+      font-weight: 500;
+      top: -5px;
+      right: -5px;
+      padding-right: 0px;
+    }
+    .notification {
+      align-content: space-between;
+      height: 25px;
+      width: 25px;
+      border: 1px solid transparent;
+      border-radius: 50%;
+      background-size: cover;
+      background-position: right;
+      position: relative;
+    }
+
+    .notification__num {
+      font-family: "Montserrat", "Lucida Grande", "Lucida Sans", Arial, sans-serif;
+      color: aliceblue;
+      font-weight: 700;
+      position: absolute;
+      top: 0%;
+      right: 0%;
+      left: 0%;
+      bottom: 0%;
+      background-color: brown;
+      border: 3px solid rgb(51, 51, 51);
+      border-radius: 50%;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+  </style>
   <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <div class="container-fluid">
       <a class="navbar-brand" href="/main">My REST API Shop</a>

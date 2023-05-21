@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org" xmlns:form="http://www.w3.org/1999/html">
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1" name="viewport">
+    <link crossorigin="anonymous" href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+          integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" rel="stylesheet">
+
+    <title>Add Review</title>
+    <style>
+        .rating {
+            display: inline-block;
+        }
+
+        .star {
+            font-size: 20px;
+            cursor: pointer;
+            color: #ccc;
+            transition: color 0.3s;
+        }
+
+        .star:hover,
+        .star.active {
+            color: #ffc107;
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{header :: content}"></div>
+
+<div class="container">
+    <div class="row mt-5">
+        <div class="col-6 mx-auto">
+            <h1>Review created Form</h1>
+            <form
+                    class="form-horizontal"
+                    method="post"
+                    role="form"
+                    th:action="@{/addReview}"
+            >
+
+                <div >
+                    <input type="hidden" th:value="${productId}" id="productId" name = "productId">
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label" for="message">Comment message</label>
+                    <input th:value="${reviewForm.message}" class="form-control" id="message" name="message" placeholder="Enter your message"
+                           type="text" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label" for="rating">Rating</label>
+                    <div class="rating">
+                        <input th:value="${reviewForm.rating}" class="form-control" id="rating" name="rating" type="hidden">
+                        <span class="star" onclick="setRating(1)">★</span>
+                        <span class="star" onclick="setRating(2)">★</span>
+                        <span class="star" onclick="setRating(3)">★</span>
+                        <span class="star" onclick="setRating(4)">★</span>
+                        <span class="star" onclick="setRating(5)">★</span>
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <button class="btn btn-primary mb-3" type="submit">Send review</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script crossorigin="anonymous"
+        integrity="sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+        src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    function setRating(rating) {
+        // Определите действия, которые нужно выполнить при выборе рейтинга
+        // Например, обновить значение в скрытом поле формы или отправить AJAX-запрос
+
+        // Пример: обновление значения в скрытом поле формы
+        document.getElementById('rating').value = rating;
+
+        // Пример: изменение стилей активных звездочек
+        let stars = document.getElementsByClassName('star');
+        for (let i = 0; i < stars.length; i++) {
+            if (i < rating) {
+                stars[i].classList.add('active');
+            } else {
+                stars[i].classList.remove('active');
+            }
+        }
+    }
+</script>
+
+</body>
+</html>

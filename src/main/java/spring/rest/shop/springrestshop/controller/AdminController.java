@@ -9,12 +9,16 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.entity.Notification;
 import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.EmptyFieldException;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.exception.UserAlreadyBannedException;
 import spring.rest.shop.springrestshop.exception.UserNotBannedException;
+import spring.rest.shop.springrestshop.service.NotificationService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
 
@@ -26,6 +30,7 @@ import java.util.List;
 public class AdminController {
     private final UserService userService;
     private final ShopService shopService;
+    private final NotificationService notificationService;
 
     @GetMapping("/panel")
     public String userList(Model model) {
@@ -154,13 +159,24 @@ public class AdminController {
     }
 
     @GetMapping("/viewShopsUser")
-    public String viewShopsUser(@RequestParam(name = "userId") long userId, Authentication authentication, Model model){
+    public String viewShopsUser(@RequestParam(name = "userId") long userId, Model model){
         List<Organization> userShopList = shopService.getListActivityShopForCurrentUser(userService.getUserById(userId));
         model.addAttribute("allShops",userShopList);
-                User currentUser = userService.findUserByUsername(authentication.getName());
-        model.addAttribute("currentUser",currentUser);
         return "admin/shops";
     }
 
-    //TODO: Реализовать метод который будет отправлять пользователю уведомление
+
+    @GetMapping("/sendNotification")
+    public String sendNotification(@RequestParam(name = "userId") long userId, Model model){
+        model.addAttribute("notificationForm", new Notification());
+        model.addAttribute("userId", userId);
+        return "notification/send-notification-page";
+    }
+
+    @PostMapping("/sendNotification")
+    public String sendNotification(@RequestParam(name = "userId") long userId, @Validated Notification notificationForm, Model model) throws EntityNotFoundException, EmptyFieldException {
+        notificationService.sendMessage(userId,notificationForm);
+        return "redirect:/admin/userInfo?userId=" + userId;
+    }
 }
+

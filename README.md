@@ -2,8 +2,11 @@
   <a href="https://ibb.co/RCX7Rz7">
     <img src="https://i.ibb.co/MRz9FM9/129191080-723b3b46-4e0b-4aa5-8eb9-654c2c025b18.png" alt="Image Description" border="0">
   </a>
-</div>
+  
 
+<img src="https://img.shields.io/badge/Engine-Spring%20Boot%203.0.5-blueviolet"></img> 
+<img src="https://img.shields.io/badge/Version-1.0(alpha)-yellow"></img> <img src="https://img.shields.io/badge/License-MIT-Green"></img>
+</div>
 # Spring RestAPI Shop
 
 Проект представляет собой RESTful API для простого магазина. Он разработан с использованием следующего стека технологий: Spring Boot, Spring Security, PostgreSQL, JPA и Web MVC.

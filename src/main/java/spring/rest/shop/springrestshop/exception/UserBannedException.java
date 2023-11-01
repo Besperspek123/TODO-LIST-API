@@ -4,7 +4,7 @@ public class UserBannedException extends Exception {
     public UserBannedException() {
         super();
     }
-    public UserBannedException(String message ) {
+    public UserBannedException(String message) {
         super(message);
     }
 }

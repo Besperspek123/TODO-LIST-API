@@ -1,12 +1,10 @@
-package spring.rest.shop.springrestshop.exception_handling;
+package spring.rest.shop.springrestshop.exception_handling_api;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.view.RedirectView;
 import spring.rest.shop.springrestshop.exception.*;
 

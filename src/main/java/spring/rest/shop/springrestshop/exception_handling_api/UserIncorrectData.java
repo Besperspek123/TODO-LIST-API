@@ -1,4 +1,4 @@
-package spring.rest.shop.springrestshop.exception_handling;
+package spring.rest.shop.springrestshop.exception_handling_api;
 
 import lombok.Data;
 import lombok.NoArgsConstructor;

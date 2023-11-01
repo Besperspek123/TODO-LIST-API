@@ -1,6 +1,7 @@
 package spring.rest.shop.springrestshop.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -30,15 +31,16 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
+    @SneakyThrows
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userRepository.findByUsername(username);
-//        if (user == null) {
-//            throw new UsernameNotFoundException("User not found");
-//        }
-//        if (!user.getActivity()) {
-//            throw new UserBannedException("User is banned"); // Исключение при неактивном пользователе
-//        }
+        if (user == null) {
+            throw new UserNotFoundException("User not found");
+        }
+        if (!user.getActivity()) {
+            throw new UserBannedException("User is banned");
+        }
         return JwtEntityFactory.create(user);
 
     }

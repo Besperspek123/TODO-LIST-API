@@ -26,6 +26,11 @@ public class UserController {
     @Autowired
     ProductService productService;
 
+    @RequestMapping("/")
+    public String index(){
+        return "redirect:/login";
+    }
+
     @GetMapping("/login")
     public String loginPage(){
         return "login";

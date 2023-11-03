@@ -31,9 +31,8 @@ public class UserService implements UserDetailsService {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-    @SneakyThrows
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+    public UserDetails loadUserByUsername(String username) {
         User user = userRepository.findByUsername(username);
         if (user == null) {
             throw new UserNotFoundException("User not found");
@@ -81,8 +80,16 @@ public class UserService implements UserDetailsService {
         return userRepository.findAllBy();
     }
 
-    public User findUserByUsername(String username){
-        return userRepository.findByUsername(username);
+    public User findUserByUsername(String username) {
+        User user = userRepository.findByUsername(username);
+        if(user == null){
+            System.out.println("ошибка юзер нот фаунд");
+            throw new UserNotFoundException("User not found");
+        }
+        if (!user.getActivity()) {
+            throw new UserBannedException("User is banned");
+        }
+        return user;
     }
 
     public List<User> findUsersByUsernameContaining(String string){

@@ -18,11 +18,14 @@
                     Registration successful!
                 </div>
             </div>
-            <div th:if="${param.error}">
-                <div class="alert alert-danger">Invalid Email or Password !!!</div>
+            <div class="banned-popup" style="display: none;">
+                <div class="alert alert-success" role="alert">
+                    You has been banned
+                </div>
             </div>
-            <div th:if="${errorMessage}">
-                <div class="alert alert-danger">You are banned! </div>
+            <div th:if="${param.error}">
+                <div th:if="${param.error[0] == 'banned'}" class="alert alert-danger">You are banned!</div>
+                <div th:unless="${param.error[0] == 'banned'}" class="alert alert-danger">Invalid Email or Password !!!</div>
             </div>
             <div th:if="${param.logout}">
                 <div class="alert alert-success">You have been logged out !!!</div>
@@ -64,9 +67,19 @@
     if (urlParams.get('success')) {
         showSuccessPopup();
     }
+    if (urlParams.get('banned')) {
+        showBannedPopup();
+    }
 
     function showSuccessPopup() {
         const popup = document.querySelector('.success-popup');
+        popup.style.display = 'block';
+        setTimeout(() => {
+            popup.style.display = 'none';
+        }, 3000);
+    }
+    function showBannedPopup() {
+        const popup = document.querySelector('.banned-popup');
         popup.style.display = 'block';
         setTimeout(() => {
             popup.style.display = 'none';

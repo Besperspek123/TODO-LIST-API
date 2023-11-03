@@ -16,14 +16,10 @@ public class ShopDTO {
     private String name;
     private String description;
 
-    private List<ProductDTO> products;
-
     public ShopDTO (Organization shop){
         this.id = shop.getId();
         this.name = shop.getName();
         this.description = shop.getDescription();
-        this.products = shop.getProductList().stream().map(ProductDTO::new).collect(Collectors.toList());
-
     }
 
 

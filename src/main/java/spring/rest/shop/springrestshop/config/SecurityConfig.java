@@ -53,6 +53,9 @@ public class SecurityConfig {
     @Autowired
     DataSource dataSource;
 
+    @Autowired
+    private CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
+
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -67,6 +70,7 @@ public class SecurityConfig {
                 .formLogin()
                 .loginPage("/login")
                 .loginProcessingUrl("/login")
+                .failureHandler(customAuthenticationFailureHandler)
                 .successHandler((request, response, authentication) -> {
                     if (userService.findUserByUsername(authentication.getName()).getRoles().contains(Role.ROLE_ADMIN)) {
                         response.sendRedirect("/main");

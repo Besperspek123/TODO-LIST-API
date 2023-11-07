@@ -1,5 +1,6 @@
 package spring.rest.shop.springrestshop.config;
 
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
@@ -82,8 +83,11 @@ public class SecurityConfig {
                 .and()
                 .exceptionHandling()
                 .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpStatus.UNAUTHORIZED.value());
-                    response.getWriter().write("UNAUTHORIZED");
+                    if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
+                        response.sendError(HttpStatus.UNAUTHORIZED.value());
+                    } else {
+                        response.sendRedirect("/login");
+                    }
                 })
                 .accessDeniedHandler((request, response, accessDeniedException) -> {
                     response.setStatus(HttpStatus.FORBIDDEN.value());

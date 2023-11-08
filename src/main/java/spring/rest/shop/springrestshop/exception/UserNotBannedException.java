@@ -1,6 +1,6 @@
 package spring.rest.shop.springrestshop.exception;
 
-public class UserNotBannedException extends Exception {
+public class UserNotBannedException extends RuntimeException {
     public UserNotBannedException() {
         super();
     }

@@ -26,7 +26,19 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
     }
     @ExceptionHandler
+    public ResponseEntity<UserIncorrectData> UserWithThisMailAlreadyRegistered(UserWithThisMailAlreadyRegistered exception){
+        UserIncorrectData data = new UserIncorrectData();
+        data.setInfo(exception.getMessage());
+        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler
     public ResponseEntity<UserIncorrectData> userAlreadyBannedException(UserAlreadyBannedException exception){
+        UserIncorrectData data = new UserIncorrectData();
+        data.setInfo(exception.getMessage());
+        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler
+    public ResponseEntity<UserIncorrectData> UserPasswordAndConfirmPasswordIsDifferentException(UserPasswordAndConfirmPasswordIsDifferentException exception){
         UserIncorrectData data = new UserIncorrectData();
         data.setInfo(exception.getMessage());
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);

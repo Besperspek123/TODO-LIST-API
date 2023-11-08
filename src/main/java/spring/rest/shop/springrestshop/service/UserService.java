@@ -1,13 +1,11 @@
 package spring.rest.shop.springrestshop.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,43 +30,30 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String username) {    
+        User user = userRepository.findByUsernameIgnoreCase(username);
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
-        if (!user.getActivity()) {
-            throw new UserBannedException("User is banned");
+        if (!user.getActivity()) {                              
+            throw new UserBannedException("User is banned");    
         }
-        return JwtEntityFactory.create(user);
-
+        return JwtEntityFactory.create(user);                   
+                                                            
     }
-    public boolean checkIfUserExistsByUsername(User user){
-        if(user.getId() == null){
-            if (userRepository.findByUsername(user.getUsername()) == null){
-                return false;
-            }
-
-        }
-        else if (user.getUsername().equals(userRepository.findById((long) user.getId()).getUsername()) ||
-                !user.getUsername().equals(userRepository.findById((long) user.getId()).getUsername())
-                && userRepository.findByUsername(user.getUsername()) == null){
+    public boolean checkIfUserExistsByUsername(String username){
+        User user = userRepository.findByUsernameIgnoreCase(username);
+        if(user == null){
             return false;
         }
-        return true;
+        else return true;
     }
-    public boolean checkIfUserExistsByEmail(User user){
-        if(user.getId() == null){
-            if(userRepository.findByEmail(user.getEmail()) == null){
-                return false;
-            }
-        }
-        else if(user.getEmail().equals(userRepository.findById((long) user.getId()).getEmail())
-                || !user.getEmail().equals(userRepository.findById((long) user.getId()).getEmail())
-                && userRepository.findByEmail(user.getEmail()) == null){
+    public boolean checkIfUserExistsByEmail(String email){
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if (user == null){
             return false;
         }
-        return true;
+        else return true;
     }
 
 
@@ -81,9 +66,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsernameIgnoreCase(username);
         if(user == null){
-            System.out.println("ошибка юзер нот фаунд");
             throw new UserNotFoundException("User not found");
         }
         if (!user.getActivity()) {
@@ -115,13 +99,13 @@ public class UserService implements UserDetailsService {
         }
         User user = userRepository.findById(userId);
         if(editUser.getUsername() != null){
-            if(userRepository.findByUsername(editUser.getUsername()) != null){
+            if(userRepository.findByUsernameIgnoreCase(editUser.getUsername()) != null){
                 throw new UserAlreadyRegisteredException("Username: "+ editUser.getUsername() +" already exist");
             }
             user.setUsername(editUser.getUsername());
         }
         if(editUser.getEmail() != null){
-            if(userRepository.findByEmail(editUser.getEmail()) != null){
+            if(userRepository.findByEmailIgnoreCase(editUser.getEmail()) != null){
                 throw new UserAlreadyRegisteredException("Email: " + editUser.getEmail() + " already exist");
             }
             user.setEmail(editUser.getEmail());

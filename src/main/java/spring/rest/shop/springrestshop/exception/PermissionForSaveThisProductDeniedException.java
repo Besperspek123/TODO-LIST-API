@@ -1,6 +1,6 @@
 package spring.rest.shop.springrestshop.exception;
 
-public class PermissionForSaveThisProductDeniedException extends Exception {
+public class PermissionForSaveThisProductDeniedException extends RuntimeException {
     public PermissionForSaveThisProductDeniedException() {
         super();
     }

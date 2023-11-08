@@ -75,7 +75,7 @@ public class UserController {
                 return "admin/edit-user";
             }
         }
-        if (userService.checkIfUserExistsByUsername(userForm)) {
+        if (userService.checkIfUserExistsByUsername(userForm.getUsername())) {
             model.addAttribute("usernameError", "Пользователь с таким именем уже существует");
             if (userForm.getId() == null) {
                 return "registration";
@@ -84,7 +84,7 @@ public class UserController {
                 return "admin/edit-user";
             }
         }
-        if (userService.checkIfUserExistsByEmail(userForm)) {
+        if (userService.checkIfUserExistsByEmail(userForm.getEmail())) {
             model.addAttribute("emailError", "Пользователь с такой почтой уже существует");
             if (userForm.getId() == null) {
                 return "registration";

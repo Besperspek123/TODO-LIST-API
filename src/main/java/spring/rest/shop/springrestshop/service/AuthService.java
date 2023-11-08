@@ -9,6 +9,8 @@ import spring.rest.shop.springrestshop.dto.jwt.JwtRequest;
 import spring.rest.shop.springrestshop.dto.jwt.JwtResponse;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
+import spring.rest.shop.springrestshop.exception.UserPasswordAndConfirmPasswordIsDifferentException;
+import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegistered;
 import spring.rest.shop.springrestshop.jwt.JwtTokenProvider;
 
 @Service
@@ -36,16 +38,27 @@ public class AuthService {
         return jwtTokenProvider.refreshUserTokens(refreshToken);
     }
 
-    public void register(SignUpDto user) throws UserAlreadyRegisteredException {
-        if(userService.findUserByUsername(user.getUsername())!=null)
+    public void register(SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegistered, UserPasswordAndConfirmPasswordIsDifferentException {
+        User userForRegistration= new User();
+
+        if(userService.checkIfUserExistsByUsername(user.getUsername()))
         {
             throw new UserAlreadyRegisteredException("User with username: "+ user.getUsername() +" already registered");
         }
-        User userForRegistration= new User();
         userForRegistration.setUsername(user.getUsername());
+
+
+        if (!user.getPassword().equals(user.getConfirmPassword())){
+            throw new UserPasswordAndConfirmPasswordIsDifferentException("Пароли не совпадают");
+        }
         userForRegistration.setPassword(user.getPassword());
         userForRegistration.setPasswordConfirm(user.getConfirmPassword());
+
+        if(userService.checkIfUserExistsByEmail(user.getEmail())){
+            throw new UserWithThisMailAlreadyRegistered("User with email: "+ user.getEmail() +" already registered");
+        }
         userForRegistration.setEmail(user.getEmail());
+
         userService.saveNewUser(userForRegistration);
 
     }

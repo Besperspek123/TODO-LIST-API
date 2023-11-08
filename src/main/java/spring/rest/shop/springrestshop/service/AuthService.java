@@ -10,7 +10,7 @@ import spring.rest.shop.springrestshop.dto.jwt.JwtResponse;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.exception.UserPasswordAndConfirmPasswordIsDifferentException;
-import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegistered;
+import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.jwt.JwtTokenProvider;
 
 @Service
@@ -38,7 +38,7 @@ public class AuthService {
         return jwtTokenProvider.refreshUserTokens(refreshToken);
     }
 
-    public void register(SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegistered, UserPasswordAndConfirmPasswordIsDifferentException {
+    public void register(SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
         User userForRegistration= new User();
 
         if(userService.checkIfUserExistsByUsername(user.getUsername()))
@@ -55,7 +55,7 @@ public class AuthService {
         userForRegistration.setPasswordConfirm(user.getConfirmPassword());
 
         if(userService.checkIfUserExistsByEmail(user.getEmail())){
-            throw new UserWithThisMailAlreadyRegistered("User with email: "+ user.getEmail() +" already registered");
+            throw new UserWithThisMailAlreadyRegisteredException("User with email: "+ user.getEmail() +" already registered");
         }
         userForRegistration.setEmail(user.getEmail());
 

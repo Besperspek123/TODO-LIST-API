@@ -17,7 +17,7 @@ import spring.rest.shop.springrestshop.dto.jwt.JwtRequest;
 import spring.rest.shop.springrestshop.dto.jwt.JwtResponse;
 import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.exception.UserPasswordAndConfirmPasswordIsDifferentException;
-import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegistered;
+import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.repository.UserRepository;
 import spring.rest.shop.springrestshop.service.AuthService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -47,7 +47,7 @@ public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest) {
 }
 
 @PostMapping("/register")
-public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegistered, UserPasswordAndConfirmPasswordIsDifferentException {
+public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
 
         authService.register(user);
 

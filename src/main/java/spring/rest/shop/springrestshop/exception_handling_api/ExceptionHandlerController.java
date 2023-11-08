@@ -26,7 +26,7 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
     }
     @ExceptionHandler
-    public ResponseEntity<UserIncorrectData> UserWithThisMailAlreadyRegistered(UserWithThisMailAlreadyRegistered exception){
+    public ResponseEntity<UserIncorrectData> UserWithThisMailAlreadyRegistered(UserWithThisMailAlreadyRegisteredException exception){
         UserIncorrectData data = new UserIncorrectData();
         data.setInfo(exception.getMessage());
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);

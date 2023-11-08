@@ -1,6 +1,5 @@
 package spring.rest.shop.springrestshop.service;
 
-import jakarta.validation.constraints.Null;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -12,7 +11,6 @@ import spring.rest.shop.springrestshop.exception.UserBannedException;
 import spring.rest.shop.springrestshop.exception.UserNotFoundException;
 import spring.rest.shop.springrestshop.repository.UserRepository;
 
-import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.List;
 
@@ -198,6 +196,22 @@ class UserServiceTest {
         when(userRepository.findByUsernameIgnoreCase(user.getUsername())).thenReturn(user);
         assertFalse(user.getActivity(),"Юзер должен быть забанен");
         assertThrows(UserBannedException.class,() -> userService.findUserByUsername(user.getUsername()));
+    }
+
+    @Test
+    public void findUserByUsername_UserFoundAndActive_ReturnUser(){
+        String username = "activeUser";
+        User activeUser = new User();
+        activeUser.setUsername(username);
+        activeUser.setActivity(true);
+
+        when(userRepository.findByUsernameIgnoreCase(username)).thenReturn(activeUser);
+
+        User foundUser =userService.findUserByUsername(username);
+
+        assertNotNull(foundUser,"Юзер должен быть найден");
+        assertEquals(username,foundUser.getUsername(),"Юзернеймы должны совпадать");
+        assertTrue(foundUser.getActivity(),"Юзер должен быть активным");
     }
 
     @Test

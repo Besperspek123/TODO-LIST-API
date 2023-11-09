@@ -82,9 +82,18 @@ public class UserService implements UserDetailsService {
     }
     //TODO нужно дописать метод, что бы он корректно обрабатывал изменения существующего пользователя
     public void editUser(User user) {
-            if(!user.getId().equals(findUserByUsername(user.getUsername()).getId())){
-                throw new UserAlreadyRegisteredException("User with this username already registered");
+            if(!getUserById(user.getId()).getUsername().equals(user.getUsername())){
+                if (checkIfUserExistsByUsername(user.getUsername())){
+                    throw new UserAlreadyRegisteredException("Username with this name is already registered");
+                }
             }
+        if(!getUserById(user.getId()).getEmail().equals(user.getEmail())){
+            if (checkIfUserExistsByEmail(user.getEmail())){
+                throw new UserAlreadyRegisteredException("Username with this Mail is already registered");
+            }
+        }
+        if(getUserById(user.getId()).getUsername().equals(user.getUsername())){
+        }
             if(user.getPassword() == null){
                 user.setPassword(userRepository.findById((long) user.getId()).getPassword());
             }

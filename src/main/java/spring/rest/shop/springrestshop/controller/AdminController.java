@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Notification;
 import spring.rest.shop.springrestshop.entity.Order;
@@ -55,6 +56,11 @@ public class AdminController {
         List<User> users = userService.findUsersByUsernameContaining(searchQuery);
         model.addAttribute("allUsers",users);
         return "admin/users";
+    }
+    @PostMapping("/editUser")
+    public String editUser (@ModelAttribute("userForm") @Validated User userForm, Model model, RedirectAttributes redirectAttributes){
+        userService.editUser(userForm);
+        return "redirect:/admin/users";
     }
     @GetMapping("/userInfo")
     public String userInfo(@RequestParam(name = "userId")long userId,Model model){

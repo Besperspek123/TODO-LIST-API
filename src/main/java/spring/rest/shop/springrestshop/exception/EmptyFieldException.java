@@ -1,6 +1,6 @@
 package spring.rest.shop.springrestshop.exception;
 
-public class EmptyFieldException extends Exception {
+public class EmptyFieldException extends RuntimeException {
     public EmptyFieldException() {
         super();
     }

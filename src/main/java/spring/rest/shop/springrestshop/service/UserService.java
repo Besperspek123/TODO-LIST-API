@@ -1,18 +1,17 @@
 package spring.rest.shop.springrestshop.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
@@ -32,43 +31,30 @@ public class UserService implements UserDetailsService {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
     @Override
-    public UserDetails loadUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+    public UserDetails loadUserByUsername(String username) {    
+        User user = userRepository.findByUsernameIgnoreCase(username);
         if (user == null) {
             throw new UserNotFoundException("User not found");
         }
-        if (!user.getActivity()) {
-            throw new UserBannedException("User is banned");
+        if (!user.getActivity()) {                              
+            throw new UserBannedException("User is banned");    
         }
-        return JwtEntityFactory.create(user);
-
+        return JwtEntityFactory.create(user);                   
+                                                            
     }
-    public boolean checkIfUserExistsByUsername(User user){
-        if(user.getId() == null){
-            if (userRepository.findByUsername(user.getUsername()) == null){
-                return false;
-            }
-
-        }
-        else if (user.getUsername().equals(userRepository.findById((long) user.getId()).getUsername()) ||
-                !user.getUsername().equals(userRepository.findById((long) user.getId()).getUsername())
-                && userRepository.findByUsername(user.getUsername()) == null){
+    public boolean checkIfUserExistsByUsername(String username){
+        User user = userRepository.findByUsernameIgnoreCase(username);
+        if(user == null){
             return false;
         }
-        return true;
+        else return true;
     }
-    public boolean checkIfUserExistsByEmail(User user){
-        if(user.getId() == null){
-            if(userRepository.findByEmail(user.getEmail()) == null){
-                return false;
-            }
-        }
-        else if(user.getEmail().equals(userRepository.findById((long) user.getId()).getEmail())
-                || !user.getEmail().equals(userRepository.findById((long) user.getId()).getEmail())
-                && userRepository.findByEmail(user.getEmail()) == null){
+    public boolean checkIfUserExistsByEmail(String email){
+        User user = userRepository.findByEmailIgnoreCase(email);
+        if (user == null){
             return false;
         }
-        return true;
+        else return true;
     }
 
 
@@ -81,9 +67,8 @@ public class UserService implements UserDetailsService {
     }
 
     public User findUserByUsername(String username) {
-        User user = userRepository.findByUsername(username);
+        User user = userRepository.findByUsernameIgnoreCase(username);
         if(user == null){
-            System.out.println("ошибка юзер нот фаунд");
             throw new UserNotFoundException("User not found");
         }
         if (!user.getActivity()) {
@@ -95,7 +80,11 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
+    //TODO нужно дописать метод, что бы он корректно обрабатывал изменения существующего пользователя
     public void editUser(User user) {
+            if(!user.getId().equals(findUserByUsername(user.getUsername()).getId())){
+                throw new UserAlreadyRegisteredException("User with this username already registered");
+            }
             if(user.getPassword() == null){
                 user.setPassword(userRepository.findById((long) user.getId()).getPassword());
             }
@@ -109,19 +98,19 @@ public class UserService implements UserDetailsService {
         userRepository.save(user); // сохраняем пользователя
         log.info("Saving new User with username: {}", user.getUsername());
     }
-    public void editUser(long userId, User editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
+    public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){
             throw new EntityNotFoundException("Username with ID " + userId + " not found");
         }
         User user = userRepository.findById(userId);
         if(editUser.getUsername() != null){
-            if(userRepository.findByUsername(editUser.getUsername()) != null){
+            if(userRepository.findByUsernameIgnoreCase(editUser.getUsername()) != null){
                 throw new UserAlreadyRegisteredException("Username: "+ editUser.getUsername() +" already exist");
             }
             user.setUsername(editUser.getUsername());
         }
         if(editUser.getEmail() != null){
-            if(userRepository.findByEmail(editUser.getEmail()) != null){
+            if(userRepository.findByEmailIgnoreCase(editUser.getEmail()) != null){
                 throw new UserAlreadyRegisteredException("Email: " + editUser.getEmail() + " already exist");
             }
             user.setEmail(editUser.getEmail());
@@ -135,6 +124,9 @@ public class UserService implements UserDetailsService {
     public void saveNewUser(User user) {
         if(user.getId() == null)
         {
+            if(user.getPassword().isEmpty()){
+                throw new PasswordCantBeEmptyException("Your password can`t be empty");
+            }
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user.setActivity(true);
             user.getRoles().add(Role.ROLE_USER);

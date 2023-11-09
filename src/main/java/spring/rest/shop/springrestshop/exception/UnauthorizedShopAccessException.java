@@ -1,6 +1,6 @@
 package spring.rest.shop.springrestshop.exception;
 
-public class UnauthorizedShopAccessException extends Exception {
+public class UnauthorizedShopAccessException extends RuntimeException {
     public UnauthorizedShopAccessException() {
         super();
     }

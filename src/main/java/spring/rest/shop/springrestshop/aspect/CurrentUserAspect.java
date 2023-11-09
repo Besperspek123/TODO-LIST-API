@@ -19,7 +19,7 @@ public class CurrentUserAspect {
     UserRepository userRepository;
 
     public User getCurrentUser(Authentication authentication) {
-        return userRepository.findByUsername(authentication.getName());
+        return userRepository.findByUsernameIgnoreCase(authentication.getName());
     }
 
     @Before("execution(* spring.rest.shop.springrestshop.controller.*.*(..)) ||"
@@ -28,7 +28,7 @@ public class CurrentUserAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null && authentication.isAuthenticated()) {
             String username = authentication.getName();
-            User user = userRepository.findByUsername(username);
+            User user = userRepository.findByUsernameIgnoreCase(username);
             SecurityContext.setCurrentUser(user);
         }
     }
@@ -39,7 +39,7 @@ public class CurrentUserAspect {
     public void addCurrentUserToModel(JoinPoint joinPoint) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
-            User currentUser = userRepository.findByUsername(authentication.getName());
+            User currentUser = userRepository.findByUsernameIgnoreCase(authentication.getName());
             if (currentUser != null) {
                 for (Object arg : joinPoint.getArgs()) {
                     if (arg instanceof Model) {

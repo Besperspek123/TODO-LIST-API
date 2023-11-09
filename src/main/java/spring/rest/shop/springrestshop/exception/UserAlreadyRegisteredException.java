@@ -1,6 +1,6 @@
 package spring.rest.shop.springrestshop.exception;
 
-public class UserAlreadyRegisteredException extends Exception {
+public class UserAlreadyRegisteredException extends RuntimeException {
     public UserAlreadyRegisteredException() {
         super();
     }

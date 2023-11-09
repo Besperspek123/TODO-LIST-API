@@ -235,4 +235,23 @@ class UserServiceTest {
 
     }
 
+    @Test
+    public void givenNotExistNamePart_findUsersByUsernameContaining_thenReturnListOfExistUsersWithNamePart(){
+        User user1 = new User();
+        user1.setUsername("username");
+        User user2 = new User();
+        user2.setUsername("name");
+        String namePart = "aboba";
+        List<User> expectedList = List.of(user1);
+        when(userRepository.findByUsernameContaining(namePart)).thenReturn(null);
+
+        List<User> actualList = userService.findUsersByUsernameContaining(namePart);
+
+        assertNull(actualList);
+        verify(userRepository).findByUsernameContaining(namePart);
+
+
+
+    }
+
 }

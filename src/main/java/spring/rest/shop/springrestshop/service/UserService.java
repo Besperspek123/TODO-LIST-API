@@ -11,6 +11,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
@@ -79,7 +80,11 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
+    //TODO нужно дописать метод, что бы он корректно обрабатывал изменения существующего пользователя
     public void editUser(User user) {
+            if(!user.getId().equals(findUserByUsername(user.getUsername()).getId())){
+                throw new UserAlreadyRegisteredException("User with this username already registered");
+            }
             if(user.getPassword() == null){
                 user.setPassword(userRepository.findById((long) user.getId()).getPassword());
             }
@@ -93,7 +98,7 @@ public class UserService implements UserDetailsService {
         userRepository.save(user); // сохраняем пользователя
         log.info("Saving new User with username: {}", user.getUsername());
     }
-    public void editUser(long userId, User editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
+    public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){
             throw new EntityNotFoundException("Username with ID " + userId + " not found");
         }
@@ -119,6 +124,9 @@ public class UserService implements UserDetailsService {
     public void saveNewUser(User user) {
         if(user.getId() == null)
         {
+            if(user.getPassword().isEmpty()){
+                throw new PasswordCantBeEmptyException("Your password can`t be empty");
+            }
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user.setActivity(true);
             user.getRoles().add(Role.ROLE_USER);

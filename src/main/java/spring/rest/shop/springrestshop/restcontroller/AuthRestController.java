@@ -1,5 +1,7 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +27,8 @@ import spring.rest.shop.springrestshop.service.UserService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Tag(name = "Authorization",description = "The Authorization API")
+
 public class AuthRestController{
 
     @Autowired
@@ -41,12 +45,15 @@ public class AuthRestController{
 
     private final AuthService authService;
 
+
 @PostMapping("/login")
+@Operation(summary = "Login",tags = "authorization")
 public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest) {
     return authService.login(loginRequest);
 }
 
 @PostMapping("/register")
+@Operation(summary = "Register",tags = "authorization")
 public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
 
         authService.register(user);

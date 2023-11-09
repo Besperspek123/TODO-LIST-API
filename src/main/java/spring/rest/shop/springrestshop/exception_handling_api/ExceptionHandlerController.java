@@ -44,6 +44,12 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
     }
     @ExceptionHandler
+    public ResponseEntity<UserIncorrectData> PasswordCantBeEmptyException(PasswordCantBeEmptyException exception){
+        UserIncorrectData data = new UserIncorrectData();
+        data.setInfo(exception.getMessage());
+        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
+    }
+    @ExceptionHandler
     public ResponseEntity<UserIncorrectData> userNotBanned(UserNotBannedException exception){
         UserIncorrectData data = new UserIncorrectData();
         data.setInfo(exception.getMessage());

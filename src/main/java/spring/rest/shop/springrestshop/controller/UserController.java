@@ -63,7 +63,7 @@ public class UserController {
     }
 
     @PostMapping("/registration")
-    public String addUser(@ModelAttribute("userForm") @Validated User userForm, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes) {
+    public String addUser(@ModelAttribute("userForm") @Validated User userForm, Model model, RedirectAttributes redirectAttributes) {
 
 
         if (!userForm.getPassword().equals(userForm.getPasswordConfirm())) {

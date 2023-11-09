@@ -1,5 +1,6 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
+@Tag(name = "User",description = "The User API")
 public class UserRestController {
 
     private final UserService userService;

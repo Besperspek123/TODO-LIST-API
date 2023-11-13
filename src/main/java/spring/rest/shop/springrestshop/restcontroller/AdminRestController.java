@@ -33,20 +33,20 @@ public class AdminRestController {
     private final ShopService shopService;
     private final UserService userService;
 
-    @Operation(summary = "Get all Users",tags = "administration")
+    @Operation(summary = "Get all Users")
     @GetMapping("/users")
     public List<UserDTO> getAllUsers(){
         return userService.getAllUsers().stream().map(UserDTO::new).collect(Collectors.toList());
 
     }
     @GetMapping("/users/{userId}")
-    @Operation(summary = "Get info about the user",tags = "administration")
+    @Operation(summary = "Get info about the user")
     public UserDetailsDTO getUserInfo(@PathVariable long userId){
         return new UserDetailsDTO(userService.getUserById(userId));
 
     }
 
-    @Operation(summary = "Edit the user",tags = "administration")
+    @Operation(summary = "Edit the user")
     @PutMapping("/users/{userId}")
 
     public UserDetailsDTO editUser (@PathVariable long userId, @RequestBody UserEditDTO user, Model model) throws EntityNotFoundException, UserAlreadyRegisteredException {
@@ -57,7 +57,7 @@ public class AdminRestController {
 
     }
 
-    @Operation(summary = "Ban the user",tags = "administration")
+    @Operation(summary = "Ban the user")
     @PostMapping("/users/{userId}/ban")
     public ResponseEntity<String> banUser(@PathVariable long userId) throws UserAlreadyBannedException {
         User user = userService.getUserById(userId);
@@ -66,7 +66,7 @@ public class AdminRestController {
     }
 
     @PostMapping("/users/{userId}/unban")
-    @Operation(summary = "Unban the user",tags = "administration")
+    @Operation(summary = "Unban the user")
     public ResponseEntity<String> unbanUser(@PathVariable long userId) throws UserNotBannedException {
         User user = userService.getUserById(userId);
         userService.unbanUser(userService.getUserById(userId));
@@ -74,7 +74,7 @@ public class AdminRestController {
     }
 
     @PostMapping("/users/{userId}/balance/{count}")
-    @Operation(summary = "Add balance",tags = "administration")
+    @Operation(summary = "Add balance")
     public UserDetailsDTO addBalance(@PathVariable long count,@PathVariable long userId){
         User user = userService.getUserById(userId);
         if(user== null){

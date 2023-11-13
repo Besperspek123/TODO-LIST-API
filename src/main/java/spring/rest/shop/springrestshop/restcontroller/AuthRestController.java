@@ -47,13 +47,13 @@ public class AuthRestController{
 
 
 @PostMapping("/login")
-@Operation(summary = "Login",tags = "authorization")
+@Operation(summary = "Login")
 public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest) {
     return authService.login(loginRequest);
 }
 
 @PostMapping("/register")
-@Operation(summary = "Register",tags = "authorization")
+@Operation(summary = "Register")
 public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
 
         authService.register(user);

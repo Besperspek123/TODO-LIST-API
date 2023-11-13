@@ -12,10 +12,14 @@ import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
-import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.entity.Cart;
+import spring.rest.shop.springrestshop.entity.Role;
+import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
-import spring.rest.shop.springrestshop.repository.*;
+import spring.rest.shop.springrestshop.repository.CartRepository;
+import spring.rest.shop.springrestshop.repository.UserRepository;
+
 
 import java.util.List;
 
@@ -37,7 +41,7 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException("User not found");
         }
         if (!user.getActivity()) {                              
-            throw new UserBannedException("User is banned");    
+            throw new UserBannedException("User is banned");
         }
         return JwtEntityFactory.create(user);                   
                                                             

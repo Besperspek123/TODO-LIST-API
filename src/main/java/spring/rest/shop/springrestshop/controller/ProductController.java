@@ -48,15 +48,10 @@ public class ProductController {
         @PostMapping("/addProduct")
         public String addProductForCurrentShop(@ModelAttribute("productForm") @Validated Product productForm,
         @RequestParam ("shopId") int shopId) throws UnauthorizedShopAccessException, EntityNotFoundException {
-            User currentUser = SecurityContext.getCurrentUser();
-            if(productForm.getId() != 0){
-                if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
-                        || currentUser == productService.getProductDetails(productForm.getId()).getOrganization().getOwner()){
-                    productService.addProduct(productForm, shopId);
-                }
-                else throw new PermissionForSaveThisProductDeniedException("Denied");
+            if(productService.checkPermissionToAddProductIntoTheShop(shopId)){
+                productService.addProduct(productForm,shopId);
             }
-            else productService.addProduct(productForm, shopId);
+            else throw new PermissionForSaveThisProductDeniedException("You don`t have permission to save this product to this shop");
         return "redirect:/viewShop?shopId="+ shopId;
         }
 

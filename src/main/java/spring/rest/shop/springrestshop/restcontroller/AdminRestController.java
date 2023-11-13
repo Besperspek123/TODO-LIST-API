@@ -9,12 +9,15 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import spring.rest.shop.springrestshop.dto.notification.NotificationDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDetailsDTO;
 import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
+import spring.rest.shop.springrestshop.entity.Notification;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.*;
+import spring.rest.shop.springrestshop.service.NotificationService;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.ShopService;
 import spring.rest.shop.springrestshop.service.UserService;
@@ -31,6 +34,7 @@ public class AdminRestController {
 
     private final ProductService productService;
     private final ShopService shopService;
+    private final NotificationService notificationService;
     private final UserService userService;
 
     @Operation(summary = "Get all Users")
@@ -85,6 +89,13 @@ public class AdminRestController {
 
 
 
+    }
+
+    @PostMapping("/notifications/{userId}")
+    @Operation(summary = "Send notification to User")
+    public NotificationDTO sendNotification(@PathVariable long userId, @RequestBody Notification notification) throws EntityNotFoundException, EmptyFieldException {
+        notificationService.sendMessage(userId,notification);
+        return new NotificationDTO(notification);
     }
 
 }

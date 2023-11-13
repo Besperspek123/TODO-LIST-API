@@ -45,6 +45,7 @@ public class ShopService {
 
 
             //TODO need to change in false when be make admin mode
+            //this code move new shop to moderation shop list
 //        if(!owner.getRoles().contains(Role.ROLE_ADMIN)){
 //            shop.setActivity(false);
 //        }

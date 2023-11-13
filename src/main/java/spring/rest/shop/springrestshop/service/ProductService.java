@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
+import spring.rest.shop.springrestshop.exception.PermissionForSaveThisProductDeniedException;
 import spring.rest.shop.springrestshop.exception.UnauthorizedShopAccessException;
 import spring.rest.shop.springrestshop.repository.*;
 
@@ -21,6 +22,7 @@ public class ProductService {
     private final ProductRepository productRepository;
 
     private final ShopRepository shopRepository;
+    private final ShopService shopService;
     private final KeywordRepository keywordRepository;
     private final CharacteristicRepository characteristicRepository;
     private final CartProductRepository cartProductRepository;
@@ -49,6 +51,16 @@ public class ProductService {
             throw new EntityNotFoundException("Product with ID: " + id + " not found");
         }
         return product;
+
+    }
+
+    public boolean checkPermissionToAddProductIntoTheShop(long shopId){
+        User currentUser = SecurityContext.getCurrentUser();
+            if(currentUser.getRoles().stream().anyMatch(role -> role.name().equals("ROLE_ADMIN"))
+                    || currentUser == shopService.getShopById(shopId).getOwner()){
+                return true;
+            }
+            return false;
 
     }
 

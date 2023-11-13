@@ -70,13 +70,11 @@ public class ReviewService {
 
     }
 
-    //TODO need to uncomment code when be made api for review
     private boolean isUserBuyThisProduct(long productId) {
-       return true;
-//        User currentUser = SecurityContext.getCurrentUser();
-//        List<Order> orderList = currentUser.getOrderList();
-//        return orderList.stream().flatMap(order -> order.getProductList().stream())
-//                .anyMatch(cartProduct -> cartProduct.getProduct().getId() == productId);
+        User currentUser = SecurityContext.getCurrentUser();
+        List<Order> orderList = currentUser.getOrderList();
+        return orderList.stream().flatMap(order -> order.getProductList().stream())
+                .anyMatch(cartProduct -> cartProduct.getProduct().getId() == productId);
     }
 
     public Review getReviewFromId(long id){

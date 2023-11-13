@@ -54,11 +54,7 @@ public class ProductController {
                         || currentUser == productService.getProductDetails(productForm.getId()).getOrganization().getOwner()){
                     productService.addProduct(productForm, shopId);
                 }
-                else try {
-                    throw new PermissionForSaveThisProductDeniedException("Denied");
-                } catch (PermissionForSaveThisProductDeniedException e) {
-                    System.out.println(e.getMessage());
-                }
+                else throw new PermissionForSaveThisProductDeniedException("Denied");
             }
             else productService.addProduct(productForm, shopId);
         return "redirect:/viewShop?shopId="+ shopId;

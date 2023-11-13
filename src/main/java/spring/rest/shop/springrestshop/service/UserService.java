@@ -80,7 +80,6 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
-    //TODO нужно дописать метод, что бы он корректно обрабатывал изменения существующего пользователя
     public void editUser(User user) {
             if(!getUserById(user.getId()).getUsername().equals(user.getUsername())){
                 if (checkIfUserExistsByUsername(user.getUsername())){

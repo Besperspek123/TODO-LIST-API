@@ -38,11 +38,5 @@ public class NotificationRestController {
                .stream().map(NotificationForCurrentUserDTO::new).collect(Collectors.toList());
    }
 
-   //TODO need to move to admin controller
-   @PostMapping("/notifications/{userId}")
-   @Operation(summary = "Send notification to User")
-    public NotificationDTO sendNotification(@PathVariable long userId, @RequestBody Notification notification) throws EntityNotFoundException, EmptyFieldException {
-            notificationService.sendMessage(userId,notification);
-            return new NotificationDTO(notification);
-   }
+
 }

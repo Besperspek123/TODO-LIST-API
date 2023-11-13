@@ -51,11 +51,9 @@
     <a class="btn btn-primary add-shop-button" href="/addShop">Add Shop</a>
 </div>
 
-<!--TODO:Поправить надписать о том, что нету магазинов, что бы она отображалась по центру -->
-<h3 style="text-align: center">ACTIVE STORES</h3>
-<span th:if="${listActiveShopForCurrentUser.size()==0}">There's nothing here yet</span>
+<h3 th:if="${listActiveShopForCurrentUser.size() > 0}" style="text-align: center">ACTIVE STORES</h3>
 
-<div style="display: flex; flex-wrap: wrap; justify-content: center; width: 800px; margin: 10px auto;gap: 15px">
+<div th:if="${listActiveShopForCurrentUser.size() > 0}" style="display: flex; flex-wrap: wrap; justify-content: center; width: 800px; margin: 10px auto; gap: 15px">
     <a th:href="@{/viewShop(shopId=${shop.id})}" th:data-id="${shop.id}" class="shop-block" th:each="shop : ${listActiveShopForCurrentUser}"
        style="align-items: center;
             justify-content: center;
@@ -68,9 +66,8 @@
 
 <hr>
 
-<h3 style="text-align: center">STORES THAT ARE UNDER MODERATION </h3>
-<span th:if="${listModerationShopForCurrentUser.size()==0}">There's nothing here yet</span>
-<div style="display: flex; flex-wrap: wrap; justify-content: center; width: 800px; margin: 10px auto;gap: 15px">
+<h3 th:if="${listModerationShopForCurrentUser.size() > 0}" style="text-align: center">STORES THAT ARE UNDER MODERATION </h3>
+<div th:if="${listModerationShopForCurrentUser.size() > 0}" style="display: flex; flex-wrap: wrap; justify-content: center; width: 800px; margin: 10px auto; gap: 15px">
     <a th:href="@{/viewShop(shopId=${shop.id})}" th:data-id="${shop.id}" class="shop-block" th:each="shop : ${listModerationShopForCurrentUser}"
        style="align-items: center;
             justify-content: center;

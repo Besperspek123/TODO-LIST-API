@@ -1,6 +1,10 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -9,6 +13,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import spring.rest.shop.springrestshop.dto.notification.NotificationDTO;
+import spring.rest.shop.springrestshop.dto.review.ReviewDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDetailsDTO;
 import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
@@ -83,9 +88,9 @@ public class AdminRestController {
 
     @PostMapping("/notifications/{userId}")
     @Operation(summary = "Send notification to User")
-    public ResponseEntity<NotificationDTO> sendNotification(@PathVariable long userId, @RequestBody Notification notification) throws EntityNotFoundException, EmptyFieldException {
-        notificationService.sendMessage(userId,notification);
-        return new ResponseEntity<>(new NotificationDTO(notification),HttpStatus.OK);
+    public ResponseEntity<String> sendNotification(@PathVariable long userId, @RequestBody NotificationDTO notificationDTO) throws EntityNotFoundException, EmptyFieldException {
+        notificationService.sendMessage(userId,notificationDTO);
+        return new ResponseEntity<>("Notification has been send",HttpStatus.OK);
     }
 
 }

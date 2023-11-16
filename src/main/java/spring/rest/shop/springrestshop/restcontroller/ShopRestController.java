@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import spring.rest.shop.springrestshop.dto.product.ProductDetailsDTO;
 import spring.rest.shop.springrestshop.dto.shop.ShopDTO;
+import spring.rest.shop.springrestshop.dto.shop.ShopDetailsDTO;
+import spring.rest.shop.springrestshop.dto.shop.ShopEditDTO;
 import spring.rest.shop.springrestshop.entity.Organization;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
@@ -30,10 +32,10 @@ public class ShopRestController {
         productService.addProduct(product,shopId);
         return new ResponseEntity<>(new ProductDetailsDTO(product),HttpStatus.OK);
     }
-    @Operation(summary = "Get products from your shop")
+    @Operation(summary = "Get info about any shop")
     @GetMapping("/shop/{shopId}")
-    public ResponseEntity<ShopDTO> getProductsForYourShop(@PathVariable long shopId) throws EntityNotFoundException {
-        return new ResponseEntity<>(new ShopDTO(shopService.getShopDetails(shopId)),HttpStatus.OK);
+    public ResponseEntity<ShopDetailsDTO> getInfoAboutShop(@PathVariable long shopId) throws EntityNotFoundException {
+        return new ResponseEntity<>(new ShopDetailsDTO(shopService.getShopDetails(shopId)),HttpStatus.OK);
     }
     @Operation(summary = "Delete the shop")
     @DeleteMapping("/shop/{shopId}")
@@ -44,7 +46,7 @@ public class ShopRestController {
     }
     @Operation(summary = "Edit the shop")
     @PutMapping("/shop/{shopId}")
-    public ResponseEntity<ShopDTO> editShop(@PathVariable long shopId, @RequestBody Organization shop) throws EntityNotFoundException {
+    public ResponseEntity<ShopDTO> editShop(@PathVariable long shopId, @RequestBody ShopEditDTO shop) throws EntityNotFoundException {
         shopService.editShop(shopId,shop);
         return new ResponseEntity<>(new ShopDTO(shopService.getShopById(shopId)),HttpStatus.OK);
     }

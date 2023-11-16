@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.shop.ShopDTO;
+import spring.rest.shop.springrestshop.dto.shop.ShopEditDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.*;
@@ -55,7 +56,8 @@ public class ShopService {
         }
     }
 
-    public void editShop(long shopId, Organization shopForEdit) throws EntityNotFoundException {
+    public void editShop(long shopId, ShopEditDTO shopForEdit) throws EntityNotFoundException {
+
         if(shopRepository.getOrganizationById(shopId) == null) {
             throw new EntityNotFoundException("Shop with ID: " + shopId);
         }

@@ -84,31 +84,33 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
-    public void editUser(User user) {
-            if(!getUserById(user.getId()).getUsername().equals(user.getUsername())){
-                if (checkIfUserExistsByUsername(user.getUsername())){
+    public void editUser(User givenUser) {
+        User ourUser = getUserById(givenUser.getId());
+            if(!getUserById(givenUser.getId()).getUsername().equals(givenUser.getUsername())){
+                if (checkIfUserExistsByUsername(givenUser.getUsername())){
                     throw new UserAlreadyRegisteredException("Username with this name is already registered");
                 }
             }
-        if(!getUserById(user.getId()).getEmail().equals(user.getEmail())){
-            if (checkIfUserExistsByEmail(user.getEmail())){
+        if(!getUserById(givenUser.getId()).getEmail().equals(givenUser.getEmail())){
+            if (checkIfUserExistsByEmail(givenUser.getEmail())){
                 throw new UserAlreadyRegisteredException("Username with this Mail is already registered");
             }
         }
-        if(getUserById(user.getId()).getUsername().equals(user.getUsername())){
+       if(!givenUser.getPassword().equals(givenUser.getPasswordConfirm())){
+           throw new UserPasswordAndConfirmPasswordIsDifferentException("Your password and confirm password is different");
         }
-            if(user.getPassword() == null){
-                user.setPassword(userRepository.findById((long) user.getId()).getPassword());
+            if(givenUser.getPassword() == null){
+                givenUser.setPassword(userRepository.findById((long) givenUser.getId()).getPassword());
             }
-                else user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+                else givenUser.setPassword(bCryptPasswordEncoder.encode(givenUser.getPassword()));
 
-            user.setActivity(true);
-            user.setCart(userRepository.findById((long) user.getId()).getCart());
-            user.setPasswordConfirm("");
+            givenUser.setActivity(true);
+            givenUser.setCart(userRepository.findById((long) givenUser.getId()).getCart());
+            givenUser.setPasswordConfirm("");
 
 
-        userRepository.save(user); // сохраняем пользователя
-        log.info("Saving new User with username: {}", user.getUsername());
+        userRepository.save(givenUser); // сохраняем пользователя
+        log.info("Saving new User with username: {}", givenUser.getUsername());
     }
     public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){

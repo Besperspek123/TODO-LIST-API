@@ -265,26 +265,15 @@ class UserServiceTest {
         User alreadyRegisteredUser = new User();
         alreadyRegisteredUser.setUsername("Kolya");
         alreadyRegisteredUser.setId(1L);
-        alreadyRegisteredUser.setPassword("password");
-        alreadyRegisteredUser.setActivity(true);
-        alreadyRegisteredUser.setEmail("email");
-        alreadyRegisteredUser.setCart(new Cart());
-        alreadyRegisteredUser.setUsername("kolya");
 
         User editUser = new User();
         editUser.setId(2L);
-        editUser.setPassword("password");
-        editUser.setActivity(true);
-        editUser.setEmail("email");
-        editUser.setCart(new Cart());
+
         editUser.setUsername("Vasya");
 
         User existEditUser = new User();
         existEditUser.setId(2L);
-        existEditUser.setPassword("password");
-        existEditUser.setActivity(true);
-        existEditUser.setEmail("email");
-        existEditUser.setCart(new Cart());
+
         existEditUser.setUsername("Kolya");
 
         when(userRepository.findByUsernameIgnoreCase(existEditUser.getUsername())).thenReturn(alreadyRegisteredUser);
@@ -292,5 +281,39 @@ class UserServiceTest {
 
 
         assertThrows(UserAlreadyRegisteredException.class,() -> userService.editUser(existEditUser));
+
     }
+
+    @Test
+    void testUpdateEmailAndCheckExistingMail_ShouldThrowUserAlreadyRegisteredException(){
+        User alreadyRegisteredUser = new User();
+        alreadyRegisteredUser.setEmail("asd@gmail.com");
+        alreadyRegisteredUser.setUsername("alreadyRegisteredUser");
+        alreadyRegisteredUser.setId(1L);
+
+        User editUser = new User();
+        editUser.setUsername("editUser");
+        editUser.setId(2L);
+        editUser.setEmail("dsa@gmail.com");
+
+        User existEditUser = new User();
+        existEditUser.setId(2L);
+        existEditUser.setUsername("existEditUser");
+
+        existEditUser.setEmail("asd@gmail.com");
+
+        when(userRepository.findByEmailIgnoreCase(existEditUser.getEmail())).thenReturn(alreadyRegisteredUser);
+        when(userRepository.findById(2L)).thenReturn(editUser);
+
+
+        assertThrows(UserAlreadyRegisteredException.class,() -> userService.editUser(existEditUser));
+
+    }
+    @Test
+    void giveEmptyUser_ShouldReturnNullPointerException(){
+        User user = new User();
+        assertThrows(NullPointerException.class,() -> userService.editUser(user));
+    }
+    @Test
+    void
 }

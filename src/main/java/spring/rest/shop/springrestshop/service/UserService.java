@@ -7,15 +7,20 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
-import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.entity.Cart;
+import spring.rest.shop.springrestshop.entity.Role;
+import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
-import spring.rest.shop.springrestshop.repository.*;
+import spring.rest.shop.springrestshop.repository.CartRepository;
+import spring.rest.shop.springrestshop.repository.UserRepository;
+
 
 import java.util.List;
 
@@ -26,7 +31,6 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
 
-    private final CurrentUserAspect userAspect;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -37,7 +41,7 @@ public class UserService implements UserDetailsService {
             throw new UserNotFoundException("User not found");
         }
         if (!user.getActivity()) {                              
-            throw new UserBannedException("User is banned");    
+            throw new UserBannedException("User is banned");
         }
         return JwtEntityFactory.create(user);                   
                                                             
@@ -80,23 +84,32 @@ public class UserService implements UserDetailsService {
     public List<User> findUsersByUsernameContaining(String string){
         return userRepository.findByUsernameContaining(string);
     }
-    //TODO нужно дописать метод, что бы он корректно обрабатывал изменения существующего пользователя
-    public void editUser(User user) {
-            if(!user.getId().equals(findUserByUsername(user.getUsername()).getId())){
-                throw new UserAlreadyRegisteredException("User with this username already registered");
+    public void editUser(User givenUser) {
+            if(!getUserById(givenUser.getId()).getUsername().equals(givenUser.getUsername())){
+                if (checkIfUserExistsByUsername(givenUser.getUsername())){
+                    throw new UserAlreadyRegisteredException("Username with this name is already registered");
+                }
             }
-            if(user.getPassword() == null){
-                user.setPassword(userRepository.findById((long) user.getId()).getPassword());
+        if(!getUserById(givenUser.getId()).getEmail().equals(givenUser.getEmail())){
+            if (checkIfUserExistsByEmail(givenUser.getEmail())){
+                throw new UserAlreadyRegisteredException("Username with this Mail is already registered");
             }
-                else user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
+        }
+       if(!givenUser.getPassword().equals(givenUser.getPasswordConfirm())){
+           throw new UserPasswordAndConfirmPasswordIsDifferentException("Your password and confirm password is different");
+        }
+            if(givenUser.getPassword() == null){
+                givenUser.setPassword(userRepository.findById((long) givenUser.getId()).getPassword());
+            }
+                else givenUser.setPassword(bCryptPasswordEncoder.encode(givenUser.getPassword()));
 
-            user.setActivity(true);
-            user.setCart(userRepository.findById((long) user.getId()).getCart());
-            user.setPasswordConfirm("");
+            givenUser.setActivity(true);
+            givenUser.setCart(userRepository.findById((long) givenUser.getId()).getCart());
+            givenUser.setPasswordConfirm("");
 
 
-        userRepository.save(user); // сохраняем пользователя
-        log.info("Saving new User with username: {}", user.getUsername());
+        userRepository.save(givenUser); // сохраняем пользователя
+        log.info("Edited User with username: {}", givenUser.getUsername());
     }
     public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){
@@ -179,9 +192,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void addBalance(User user, long deposit) {
+    public void addBalance(long userId, long deposit) {
+        User user = getUserById(userId);
         if(!SecurityContext.getCurrentUser().getRoles().contains(Role.ROLE_ADMIN)){
             throw new AccessDeniedException("You don`t have permission");
+        }
+
+        if(user== null){
+            throw new UsernameNotFoundException("Don`t have user with ID: " + userId);
         }
         user.setBalance(user.getBalance() + deposit);
         userRepository.save(user);

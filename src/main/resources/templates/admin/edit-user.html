@@ -24,6 +24,9 @@
                     <div th:if="${usernameError}">
                         <div class="alert alert-danger" th:text="${usernameError}"></div>
                     </div>
+                    <div th:if="${passwordError}">
+                        <div class="alert alert-danger" th:text="${passwordError}"></div>
+                    </div>
                     <label class="form-label" for="username">Username</label>
                     <input th:value="${userForm.username}" class="form-control" id="username" name="username" placeholder="Enter username"
                            type="text" required maxlength="20">
@@ -41,9 +44,7 @@
                     <label class="form-label" for="password">Password</label>
                     <input autocomplete="new-password" class="form-control" id="password" name="password" placeholder="Enter password" type="password">
 
-                    <div th:if="${passwordError}">
-                        <div class="alert alert-danger" th:text="${passwordError}"></div>
-                    </div>
+
 
                     <label class="form-label" for="passwordConfirm">Confirm Password</label>
                     <input class="form-control" id="passwordConfirm" name="passwordConfirm" placeholder="Confirm password"

@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.dto.notification.NotificationDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.CartEmptyException;
 import spring.rest.shop.springrestshop.exception.EmptyFieldException;
@@ -40,7 +41,10 @@ public class NotificationService {
         return notificationRepository.findByRecipientUser(currentUser);
     }
 
-    public void sendMessage(long userId,Notification notification) throws EntityNotFoundException, EmptyFieldException {
+    public void sendMessage(long userId, NotificationDTO notificationDTO) throws EntityNotFoundException, EmptyFieldException {
+        Notification notification = new Notification();
+        notification.setMessage(notificationDTO.getMessage());
+        notification.setTitle(notificationDTO.getTitle());
         if(!SecurityContext.getCurrentUser().getRoles().contains(Role.ROLE_ADMIN)){
             throw new AccessDeniedException("You don`t have role for this command");
         }

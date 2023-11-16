@@ -6,7 +6,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import spring.rest.shop.springrestshop.entity.User;
+import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.exception.UserBannedException;
 import spring.rest.shop.springrestshop.exception.UserNotFoundException;
 import spring.rest.shop.springrestshop.repository.UserRepository;
@@ -25,6 +27,8 @@ class UserServiceTest {
     @Mock
     UserRepository userRepository;
 
+    @Mock
+    BCryptPasswordEncoder bCryptPasswordEncoder;
     @InjectMocks
     UserService userService;
 
@@ -183,13 +187,13 @@ class UserServiceTest {
     }
 
     @Test
-    public void findUserByUsername_UserNotFound_ThrowException(){
+    void findUserByUsername_UserNotFound_ThrowException(){
         String username = "username";
         when(userRepository.findByUsernameIgnoreCase(username)).thenReturn(null);
         assertThrows(UserNotFoundException.class,() -> userService.findUserByUsername(username));
     }
     @Test
-    public void findUserByUsername_UserBanned_ThrowException(){
+    void findUserByUsername_UserBanned_ThrowException(){
         User user = new User();
         user.setActivity(false);
         user.setUsername("username");
@@ -199,7 +203,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void findUserByUsername_UserFoundAndActive_ReturnUser(){
+    void findUserByUsername_UserFoundAndActive_ReturnUser(){
         String username = "activeUser";
         User activeUser = new User();
         activeUser.setUsername(username);
@@ -215,7 +219,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void givenExistNamePart_findUsersByUsernameContaining_thenReturnListOfExistUsersWithNamePart(){
+    void givenExistNamePart_findUsersByUsernameContaining_thenReturnListOfExistUsersWithNamePart(){
         User user1 = new User();
         user1.setUsername("username");
         User user2 = new User();
@@ -236,7 +240,7 @@ class UserServiceTest {
     }
 
     @Test
-    public void givenNotExistNamePart_findUsersByUsernameContaining_thenReturnListOfExistUsersWithNamePart(){
+    void givenNotExistNamePart_findUsersByUsernameContaining_thenReturnListOfExistUsersWithNamePart(){
         User user1 = new User();
         user1.setUsername("username");
         User user2 = new User();
@@ -252,6 +256,61 @@ class UserServiceTest {
 
 
 
+    }
+
+    @Test
+     void testUpdateUsernameAndCheckExistingUsername_ShouldThrowUserAlreadyRegisteredException() {
+        User alreadyRegisteredUser = new User();
+        alreadyRegisteredUser.setUsername("Kolya");
+        alreadyRegisteredUser.setId(1L);
+
+        User editUser = new User();
+        editUser.setId(2L);
+
+        editUser.setUsername("Vasya");
+
+        User existEditUser = new User();
+        existEditUser.setId(2L);
+
+        existEditUser.setUsername("Kolya");
+
+        when(userRepository.findByUsernameIgnoreCase(existEditUser.getUsername())).thenReturn(alreadyRegisteredUser);
+        when(userRepository.findById(2L)).thenReturn(editUser);
+
+
+        assertThrows(UserAlreadyRegisteredException.class,() -> userService.editUser(existEditUser));
+
+    }
+
+    @Test
+    void testUpdateEmailAndCheckExistingMail_ShouldThrowUserAlreadyRegisteredException(){
+        User alreadyRegisteredUser = new User();
+        alreadyRegisteredUser.setEmail("asd@gmail.com");
+        alreadyRegisteredUser.setUsername("alreadyRegisteredUser");
+        alreadyRegisteredUser.setId(1L);
+
+        User editUser = new User();
+        editUser.setUsername("editUser");
+        editUser.setId(2L);
+        editUser.setEmail("dsa@gmail.com");
+
+        User existEditUser = new User();
+        existEditUser.setId(2L);
+        existEditUser.setUsername("existEditUser");
+
+        existEditUser.setEmail("asd@gmail.com");
+
+        when(userRepository.findByEmailIgnoreCase(existEditUser.getEmail())).thenReturn(alreadyRegisteredUser);
+        when(userRepository.findById(2L)).thenReturn(editUser);
+
+
+        assertThrows(UserAlreadyRegisteredException.class,() -> userService.editUser(existEditUser));
+
+    }
+    @Test
+    void giveEmptyUser_ShouldReturnNullPointerException(){
+        User user = new User();
+        assertThrows(NullPointerException.class,() -> userService.editUser(user));
     }
 
 }

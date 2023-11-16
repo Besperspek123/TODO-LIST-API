@@ -26,6 +26,7 @@
             padding: 10px;
             height: 200px;
             width: calc(20% - 30px);
+            overflow: hidden; /* добавлен стиль overflow: hidden; */
             transition: background-color 0.5s ease;
             cursor: pointer;
         }
@@ -148,7 +149,7 @@
             </span>
                     <span class="product-organization" th:text="${product.getOrganization().getName()}" />
 
-                    <div th:if="${product.getOrganization().getOwner() == currentUser || #lists.contains(currentUser.roles.![name], 'ROLE_ADMIN')}">
+                    <div id="productBlock" th:if="${product.getOrganization().getOwner() == currentUser || #lists.contains(currentUser.roles.![name], 'ROLE_ADMIN')}">
                         <form method="get" th:action="@{editProduct}">
                             <input type="hidden" name="edit" value="edit" />
                             <input type="hidden" name="productId" th:value="${product.id}" />

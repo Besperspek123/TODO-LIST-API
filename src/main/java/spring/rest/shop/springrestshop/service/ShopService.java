@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.shop.ShopDTO;
+import spring.rest.shop.springrestshop.dto.shop.ShopEditDTO;
 import spring.rest.shop.springrestshop.entity.*;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.*;
@@ -45,6 +46,7 @@ public class ShopService {
 
 
             //TODO need to change in false when be make admin mode
+            //this code move new shop to moderation shop list
 //        if(!owner.getRoles().contains(Role.ROLE_ADMIN)){
 //            shop.setActivity(false);
 //        }
@@ -54,7 +56,8 @@ public class ShopService {
         }
     }
 
-    public void editShop(long shopId, Organization shopForEdit) throws EntityNotFoundException {
+    public void editShop(long shopId, ShopEditDTO shopForEdit) throws EntityNotFoundException {
+
         if(shopRepository.getOrganizationById(shopId) == null) {
             throw new EntityNotFoundException("Shop with ID: " + shopId);
         }

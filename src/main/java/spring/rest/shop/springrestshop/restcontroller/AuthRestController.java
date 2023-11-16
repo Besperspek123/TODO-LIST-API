@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -20,25 +19,14 @@ import spring.rest.shop.springrestshop.dto.jwt.JwtResponse;
 import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.exception.UserPasswordAndConfirmPasswordIsDifferentException;
 import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegisteredException;
-import spring.rest.shop.springrestshop.repository.UserRepository;
 import spring.rest.shop.springrestshop.service.AuthService;
-import spring.rest.shop.springrestshop.service.UserService;
 
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
-@Tag(name = "Authorization",description = "The Authorization API")
+@Tag(name = "Authorization", description = "The Authorization API")
 
-public class AuthRestController{
-
-    @Autowired
-    private UserService userService;
-
-    @Autowired
-    private UserRepository userRepository;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+public class AuthRestController {
 
     @Autowired
     AuthenticationManager authenticationManager;
@@ -46,18 +34,19 @@ public class AuthRestController{
     private final AuthService authService;
 
 
-@PostMapping("/login")
-@Operation(summary = "Login")
-public JwtResponse login(@Validated @RequestBody JwtRequest loginRequest) {
-    return authService.login(loginRequest);
-}
+    @PostMapping("/login")
+    @Operation(summary = "Login")
+    public ResponseEntity<JwtResponse> login(@Validated @RequestBody JwtRequest loginRequest) {
+        JwtResponse response = authService.login(loginRequest);
+        return ResponseEntity.ok(response);
+    }
 
-@PostMapping("/register")
-@Operation(summary = "Register")
-public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
+    @PostMapping("/register")
+    @Operation(summary = "Register")
+    public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
 
         authService.register(user);
 
-    return new ResponseEntity<>("User with nickname: " + user.getUsername()  + " has been created",HttpStatus.ACCEPTED);
-}
+        return new ResponseEntity<>("User with nickname: " + user.getUsername() + " has been created", HttpStatus.OK);
+    }
 }

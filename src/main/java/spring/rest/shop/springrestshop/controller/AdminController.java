@@ -1,16 +1,12 @@
 package spring.rest.shop.springrestshop.controller;
 
 import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.validation.BindingResult;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.entity.Notification;
 import spring.rest.shop.springrestshop.entity.Order;
 import spring.rest.shop.springrestshop.entity.Organization;
@@ -59,6 +55,10 @@ public class AdminController {
     }
     @PostMapping("/editUser")
     public String editUser (@ModelAttribute("userForm") @Validated User userForm, Model model, RedirectAttributes redirectAttributes){
+        if(!userForm.getPassword().equals(userForm.getPasswordConfirm())){
+            model.addAttribute("passwordError", "Пароли не совпадают");
+            return "admin/edit-user";
+        }
         userService.editUser(userForm);
         return "redirect:/admin/users";
     }
@@ -109,8 +109,7 @@ public class AdminController {
     }
     @PostMapping("/addBalance")
     public String addBalance(@RequestParam(name = "deposit")int deposit,@RequestParam(name = "userId")long userId){
-        User user = userService.getUserById(userId);
-        userService.addBalance(user,deposit);
+        userService.addBalance(userId,deposit);
         return "redirect:/admin/userInfo?userId=" + userId;
     }
 
@@ -158,8 +157,7 @@ public class AdminController {
         return "redirect:/admin/moderation";
     }
     @PostMapping("/deleteShop")
-    public String deleteShop(@RequestParam(name = "shopId")long shopId,Authentication authentication) throws EntityNotFoundException {
-        User currentUser = userService.findUserByUsername(authentication.getName());
+    public String deleteShop(@RequestParam(name = "shopId")long shopId) throws EntityNotFoundException {
         shopService.deleteShop(shopId);
         return "redirect:/admin/shops";
     }
@@ -180,7 +178,7 @@ public class AdminController {
     }
 
     @PostMapping("/sendNotification")
-    public String sendNotification(@RequestParam(name = "userId") long userId, @Validated Notification notificationForm, Model model) throws EntityNotFoundException, EmptyFieldException {
+    public String sendNotification(@RequestParam(name = "userId") long userId, @Validated Notification notificationForm) throws EntityNotFoundException, EmptyFieldException {
         notificationService.sendMessage(userId,notificationForm);
         return "redirect:/admin/userInfo?userId=" + userId;
     }

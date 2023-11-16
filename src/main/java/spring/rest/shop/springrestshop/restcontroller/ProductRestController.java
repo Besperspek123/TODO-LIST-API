@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 public class ProductRestController {
 
     private final ProductService productService;
-    private final ShopService shopService;
     private final ReviewService reviewService;
 
     @Operation(summary = "Get all Products")
     @GetMapping("/products")
-    public List<ProductDTO> getAllProduct() {
-        return productService.getAvailableProductsList().stream().map(ProductDTO::new).collect(Collectors.toList());
+    public ResponseEntity<List<ProductDTO>> getAllProduct() {
+       List<ProductDTO> allProductList = productService.getAvailableProductsList().stream().map(ProductDTO::new).collect(Collectors.toList());
+        return new ResponseEntity<>(allProductList,HttpStatus.OK);
     }
 
 
@@ -40,15 +40,15 @@ public class ProductRestController {
     @PostMapping("/products/{productId}/reviews")
     public ResponseEntity<String> addReview(@PathVariable long productId, @RequestBody ReviewCreatedDTO review) throws EntityNotFoundException {
         reviewService.addNewReview(review,productId);
-        return new ResponseEntity<>("Your review add",HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Your review add",HttpStatus.OK);
     }
 
     @Operation(summary = "Get product details")
     @GetMapping("/products/{productId}")
-    public ProductDetailsDTO getProductDetails(@PathVariable long productId) throws EntityNotFoundException {
+    public ResponseEntity<ProductDetailsDTO> getProductDetails(@PathVariable long productId) throws EntityNotFoundException {
         Product product = productService.getProductDetails(productId);
 
-        return new ProductDetailsDTO(product);
+        return new ResponseEntity<>(new ProductDetailsDTO(product),HttpStatus.OK);
 
     }
 
@@ -56,14 +56,14 @@ public class ProductRestController {
     @DeleteMapping("/products/{productId}")
     public ResponseEntity<String> deleteProduct(@PathVariable long productId){
         productService.deleteProductInShop(productId);
-        return new ResponseEntity<>("product with id:" + productId +" has been deleted",HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("product with id:" + productId +" has been deleted",HttpStatus.OK);
     }
 
 
     @Operation(summary = "Edit the product")
     @PutMapping("/products/{productId}")
-    public ProductDetailsDTO editProduct(@PathVariable long productId,@RequestBody Product product) throws EntityNotFoundException {
+    public ResponseEntity<ProductDetailsDTO> editProduct(@PathVariable long productId,@RequestBody Product product) throws EntityNotFoundException {
         productService.editProduct(productId,product);
-        return new ProductDetailsDTO(productService.getProductDetails(productId));
+        return new ResponseEntity<>(new ProductDetailsDTO(productService.getProductDetails(productId)),HttpStatus.OK);
     }
 }

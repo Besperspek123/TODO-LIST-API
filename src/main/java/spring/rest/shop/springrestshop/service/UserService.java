@@ -7,6 +7,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
@@ -30,7 +31,6 @@ public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
 
-    private final CurrentUserAspect userAspect;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -85,7 +85,6 @@ public class UserService implements UserDetailsService {
         return userRepository.findByUsernameContaining(string);
     }
     public void editUser(User givenUser) {
-        User ourUser = getUserById(givenUser.getId());
             if(!getUserById(givenUser.getId()).getUsername().equals(givenUser.getUsername())){
                 if (checkIfUserExistsByUsername(givenUser.getUsername())){
                     throw new UserAlreadyRegisteredException("Username with this name is already registered");
@@ -110,7 +109,7 @@ public class UserService implements UserDetailsService {
 
 
         userRepository.save(givenUser); // сохраняем пользователя
-        log.info("Saving new User with username: {}", givenUser.getUsername());
+        log.info("Edited User with username: {}", givenUser.getUsername());
     }
     public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){
@@ -193,9 +192,14 @@ public class UserService implements UserDetailsService {
         }
     }
 
-    public void addBalance(User user, long deposit) {
+    public void addBalance(long userId, long deposit) {
+        User user = getUserById(userId);
         if(!SecurityContext.getCurrentUser().getRoles().contains(Role.ROLE_ADMIN)){
             throw new AccessDeniedException("You don`t have permission");
+        }
+
+        if(user== null){
+            throw new UsernameNotFoundException("Don`t have user with ID: " + userId);
         }
         user.setBalance(user.getBalance() + deposit);
         userRepository.save(user);

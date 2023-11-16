@@ -1,6 +1,10 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -25,11 +29,11 @@ public class ReviewRestController {
 
     @Operation(summary = "Get review info")
     @GetMapping("/reviews/{reviewId}")
-    public ReviewDetailsDTO getReviewInfo(@PathVariable long reviewId) throws EntityNotFoundException {
+    public ResponseEntity<ReviewDetailsDTO> getReviewInfo(@PathVariable long reviewId) throws EntityNotFoundException {
         if (reviewService.getReviewFromId(reviewId) == null) {
             throw new EntityNotFoundException("Review with ID " + reviewId + " not found");
         }
-        return new ReviewDetailsDTO(reviewService.getReviewFromId(reviewId));
+        return new ResponseEntity<>(new ReviewDetailsDTO(reviewService.getReviewFromId(reviewId)),HttpStatus.OK );
     }
 
     @Operation(summary = "Delete the review")
@@ -37,19 +41,29 @@ public class ReviewRestController {
     public ResponseEntity<String> deleteReview(@PathVariable long reviewId) throws EntityNotFoundException {
 
         reviewService.deleteReview(reviewId);
-        return new ResponseEntity<>("Review with ID " + reviewId + " has been deleted", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Review with ID " + reviewId + " has been deleted", HttpStatus.OK);
     }
 
     @Operation(summary = "Get all Review for current user")
+    @ApiResponses(value = {
+            @ApiResponse(responseCode = "200", description = "List of reviews for the current user", content = {
+                    @Content(mediaType = "application/json", schema = @Schema(implementation = ReviewDTO.class))
+            }),
+            @ApiResponse(responseCode = "204", description = "No reviews found for the current user"),
+    })
     @GetMapping("/reviews")
-    public List<ReviewDTO> getAllYourReviews() {
-        return reviewService.getYourReviews().stream().map(ReviewDTO::new).collect(Collectors.toList());
+    public ResponseEntity<?> getAllYourReviews() {
+        List<ReviewDTO> listYourReview = reviewService.getYourReviews().stream().map(ReviewDTO::new).collect(Collectors.toList());
+        if(listYourReview.isEmpty()){
+            return new ResponseEntity<>("You don`t have any review",HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(listYourReview,HttpStatus.OK);
     }
 
     @Operation(summary = "Edit the review")
     @PutMapping("reviews/{reviewId}")
-    public ReviewDetailsDTO editReview(@PathVariable long reviewId, @RequestBody ReviewCreatedDTO review) throws EntityNotFoundException {
+    public ResponseEntity<ReviewDetailsDTO> editReview(@PathVariable long reviewId, @RequestBody ReviewCreatedDTO review) throws EntityNotFoundException {
         reviewService.editReview(reviewId, review);
-        return new ReviewDetailsDTO(reviewService.getReviewFromId(reviewId));
+        return new ResponseEntity<>(new ReviewDetailsDTO(reviewService.getReviewFromId(reviewId)),HttpStatus.OK);
     }
 }

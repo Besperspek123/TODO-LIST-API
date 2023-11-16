@@ -24,21 +24,21 @@ public class OrdersRestController {
 
     @Operation(summary = "Get orders for current User")
     @GetMapping("/orders")
-    public List<OrderDTO> getListOrders(){
-        return orderService.getOrdersForCurrentUser().stream().map(OrderDTO::new).collect(Collectors.toList());
-
+    public ResponseEntity<List<OrderDTO>> getListOrders(){
+        List<OrderDTO> ordersList = orderService.getOrdersForCurrentUser().stream().map(OrderDTO::new).collect(Collectors.toList());
+        return new ResponseEntity<>(ordersList,HttpStatus.OK);
     }
     @Operation(summary = "Get info about user order")
     @GetMapping("/orders/{orderId}")
-    public OrderDTO getOrderDetails(@PathVariable long orderId){
-        return new OrderDTO(orderService.getOrderDetails(orderId));
+    public ResponseEntity<OrderDTO> getOrderDetails(@PathVariable long orderId){
+        return new ResponseEntity<>(new OrderDTO(orderService.getOrderDetails(orderId)),HttpStatus.OK);
 
     }
     @PostMapping("/orders")
     @Operation(summary = "Create an order")
     public ResponseEntity<String> createOrder() throws CartEmptyException {
         orderService.createOrder();
-        return new ResponseEntity<>("Order created", HttpStatus.ACCEPTED);
+        return new ResponseEntity<>("Order created", HttpStatus.OK);
     }
 
 

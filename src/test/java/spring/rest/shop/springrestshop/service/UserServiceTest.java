@@ -1,14 +1,12 @@
 package spring.rest.shop.springrestshop.service;
 
 import org.junit.jupiter.api.Test;
-import static org.mockito.Mockito.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
 import spring.rest.shop.springrestshop.exception.UserBannedException;
@@ -314,6 +312,5 @@ class UserServiceTest {
         User user = new User();
         assertThrows(NullPointerException.class,() -> userService.editUser(user));
     }
-    @Test
-    void
+
 }

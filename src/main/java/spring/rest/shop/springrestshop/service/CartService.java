@@ -166,13 +166,14 @@ public class CartService  {
 
     }
 
-    public void updateCartItem(Cart cart, long productId, long quantity) {
-        for (CartProduct cartProduct: cart.getCartProducts()
+    public void updateCartItem(long productId, long quantity) {
+        User currentUser = SecurityContext.getCurrentUser();
+        for (CartProduct cartProduct: currentUser.getCart().getCartProducts()
              ) {
-            if(cartProduct.getProduct().getId() == productId){
+            if(cartProduct.getId() == productId){
                 cartProduct.setQuantity((int)quantity);
                 cartProductRepository.save(cartProduct);
-                calculateTotalCost(cart);
+                calculateTotalCost(currentUser.getCart());
             }
         }
     }

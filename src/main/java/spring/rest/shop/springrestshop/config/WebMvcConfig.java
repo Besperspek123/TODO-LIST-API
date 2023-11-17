@@ -22,6 +22,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
                 .addResourceLocations("classpath:/webjars/"); // Удалите "**" из пути
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/images/");
+        registry.addResourceHandler("/js/**")
+                .addResourceLocations("classpath:/js/");
     }
 
 }

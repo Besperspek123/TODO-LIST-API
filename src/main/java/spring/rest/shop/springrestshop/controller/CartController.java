@@ -65,6 +65,10 @@ public class CartController {
         return "cart/details";
     }
 
+    //TODO need to fix bug when you try refuse count of product in cart when your count is 10 you can`t do it because you see exception
+    // that shop doesnt have enough items
+
+    //TODO sometimes i get error filter when i am trying to add count to product in cart
     @PostMapping("/cart/update")
     @ResponseBody
     public Map<String, Object> updateCart(@RequestParam(name = "productId") long cartProductID, @RequestParam(name = "quantity") int quantity, Authentication authentication) {

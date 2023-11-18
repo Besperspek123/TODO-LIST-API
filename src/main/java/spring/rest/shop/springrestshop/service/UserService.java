@@ -142,10 +142,10 @@ public class UserService implements UserDetailsService {
             }
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user.setActivity(true);
-            user.getRoles().add(Role.ROLE_USER);
             if (user.getUsername().equals("admin")){
                 user.getRoles().add(Role.ROLE_ADMIN);
             }
+            else user.getRoles().add(Role.ROLE_USER);
             Cart cart =new Cart();
             cartRepository.save(cart);
             cart.setBuyer(user);

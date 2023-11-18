@@ -78,7 +78,7 @@ public class CartController {
         if (cartProduct.getProduct().getAmountInStore() == 0) {
             response.put("success", false);
             response.put("message", "Shop doesn't have enough amount of products");
-        } else if (!cartService.checkAvailability(cartProduct.getProduct())) {
+        } else if (!cartService.checkAvailability(cartProduct.getProduct(),quantity)) {
             response.put("success", false);
             response.put("message", "Shop doesn't have enough amount of products");
         } else if(quantity <= 0){

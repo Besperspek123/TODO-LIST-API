@@ -40,13 +40,20 @@ public class CurrentUserAspect {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication != null) {
             User currentUser = userRepository.findByUsernameIgnoreCase(authentication.getName());
+            System.out.println("пользователь был получен");
             if (currentUser != null) {
                 for (Object arg : joinPoint.getArgs()) {
                     if (arg instanceof Model) {
                         ((Model) arg).addAttribute("currentUser", currentUser);
+                        System.out.println("Передан пользователь в модель");
+//                        System.out.println(currentUser.getCart().getCartProducts().size());
+//                        System.out.println(currentUser.getCart());
+
                     }
-                    if (arg instanceof ModelAndView) {
+                    else if (arg instanceof ModelAndView) {
                         ((ModelAndView) arg).addObject("currentUser", currentUser);
+                        System.out.println("Передан пользователь в модель");
+                        System.out.println(currentUser.getCart().getCartProducts().size());
                     }
                 }
             }

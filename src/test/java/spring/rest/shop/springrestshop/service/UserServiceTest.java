@@ -17,6 +17,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -312,5 +313,41 @@ class UserServiceTest {
         User user = new User();
         assertThrows(NullPointerException.class,() -> userService.editUser(user));
     }
+    @Test
+    void giveUserWithEmptyPassword_ShouldReturnUserWithOldPassword() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("username");
+        user.setEmail("email");
+        user.setPassword("password");
+
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("username123");
+        user1.setEmail("email123");
+        user1.setPassword("");
+        user1.setPasswordConfirm("");
+
+        when(userRepository.findById(1L)).thenReturn(user);
+
+        userService.editUser(user1);
+        assertEquals(user1.getPassword(),user.getPassword());
+        verify(userRepository).save(user1);
+
+    }
+
+    @Test
+    void giveCorrectUserAndTryEdit_ShouldReturnEditedUser(){
+        User user1 = new User(1L,"usermame",true,"password","password","email");
+        User user2 = new User(1L,"usermame1",true,"password1","password1","email1");
+
+        when(userRepository.findById(1L)).thenReturn(user1);
+        User user1Copy = new User(1L,"usermame",true,"password","password","email");
+        userService.editUser(user2);
+        verify(userRepository).save(user1Copy); // Проверяем, что сохранен оригинальный user1
+        assertEquals(user1Copy.getUsername(), "usermame1"); // Проверяем, что в копии изменилось имя пользователя
+
+    }
+
 
 }

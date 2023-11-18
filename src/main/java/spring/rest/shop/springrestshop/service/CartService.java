@@ -181,39 +181,27 @@ public class CartService  {
 
     public void updateCartItem(long productId, long quantity) {
         User currentUser = SecurityContext.getCurrentUser();
-        for (CartProduct cartProduct: currentUser.getCart().getCartProducts()
-             ) {
-            if(cartProduct.getId() == productId){
-                cartProduct.setQuantity((int)quantity);
-                cartProductRepository.save(cartProduct);
-                calculateTotalCost(currentUser.getCart());
+        Cart cart = currentUser.getCart();
+
+        // Найдем товар по productId
+        CartProduct cartProductToUpdate = null;
+        for (CartProduct cartProduct : cart.getCartProducts()) {
+            if (cartProduct.getId() == productId) {
+                cartProductToUpdate = cartProduct;
                 break;
             }
         }
+
+        if (cartProductToUpdate != null) {
+            // Обновляем количество товара
+            cartProductToUpdate.setQuantity((int) quantity);
+
+            // Обновляем только общую стоимость после всех операций обновления товаров
+            calculateTotalCost(cart);
+
+            // Если нужно, обновляем товар в базе данных
+            cartProductRepository.save(cartProductToUpdate);
+        }
     }
-//    public void updateCartItem(long productId, long quantity) {
-//        User currentUser = SecurityContext.getCurrentUser();
-//        Cart cart = currentUser.getCart();
-//
-//        // Найдем товар по productId
-//        CartProduct cartProductToUpdate = null;
-//        for (CartProduct cartProduct : cart.getCartProducts()) {
-//            if (cartProduct.getId() == productId) {
-//                cartProductToUpdate = cartProduct;
-//                break;
-//            }
-//        }
-//
-//        if (cartProductToUpdate != null) {
-//            // Обновляем количество товара
-//            cartProductToUpdate.setQuantity((int) quantity);
-//
-//            // Обновляем только общую стоимость после всех операций обновления товаров
-//            calculateTotalCost(cart);
-//
-//            // Если нужно, обновляем товар в базе данных
-//            cartProductRepository.save(cartProductToUpdate);
-//        }
-//    }
 }
 

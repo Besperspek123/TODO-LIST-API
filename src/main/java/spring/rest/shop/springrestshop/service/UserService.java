@@ -25,15 +25,18 @@ import spring.rest.shop.springrestshop.repository.UserRepository;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
-
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public UserService(UserRepository userRepository, CartRepository cartRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
     @Override
     public UserDetails loadUserByUsername(String username) {    
         User user = userRepository.findByUsernameIgnoreCase(username);
@@ -95,10 +98,10 @@ public class UserService implements UserDetailsService {
                 throw new UserAlreadyRegisteredException("Username with this Mail is already registered");
             }
         }
-       if(!givenUser.getPassword().equals(givenUser.getPasswordConfirm())){
-           throw new UserPasswordAndConfirmPasswordIsDifferentException("Your password and confirm password is different");
+        if (!givenUser.getPassword().equals(givenUser.getPasswordConfirm())) {
+            throw new UserPasswordAndConfirmPasswordIsDifferentException("Your password and confirm password are different");
         }
-            if(givenUser.getPassword() == null){
+            if(givenUser.getPassword() == null || givenUser.getPassword().isEmpty()){
                 givenUser.setPassword(userRepository.findById((long) givenUser.getId()).getPassword());
             }
                 else givenUser.setPassword(bCryptPasswordEncoder.encode(givenUser.getPassword()));
@@ -108,7 +111,7 @@ public class UserService implements UserDetailsService {
             givenUser.setPasswordConfirm("");
 
 
-        userRepository.save(givenUser); // сохраняем пользователя
+        userRepository.save(givenUser);
         log.info("Edited User with username: {}", givenUser.getUsername());
     }
     public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {

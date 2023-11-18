@@ -15,6 +15,19 @@ import java.util.*;
 @Table(name = "users")
 @Data
 public class User implements UserDetails {
+
+    public User(Long id, String username, Boolean activity, String password,String passwordConfirm, String email) {
+        this.id = id;
+        this.username = username;
+        this.activity = activity;
+        this.password = password;
+        this.passwordConfirm = passwordConfirm;
+        this.email = email;
+    }
+    public User() {
+
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -61,6 +74,8 @@ public class User implements UserDetails {
     @JsonIgnore
     @OneToMany(mappedBy = "recipientUser",fetch = FetchType.EAGER)
     private List<Notification> notificationList = new ArrayList<>();
+
+
 
     @Override
     public String getUsername(){

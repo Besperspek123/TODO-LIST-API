@@ -6,7 +6,9 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
@@ -22,8 +24,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -414,13 +415,65 @@ class UserServiceTest {
     }
 
     @Test
-    void UserWithoutAdminRoleTryToBunUser_ShouldThrowException(){
-        User currentUser = new User(1L,"admin",true,"password","password","email");
-        currentUser.getRoles().add(Role.ROLE_ADMIN);
-        when(SecurityContext.getCurrentUser()).thenReturn(currentUser);
-        User userForBun = new User(2L,"user",true,"password","password","email");
-        assertThrows(PermissionForBanAndUnbanUserDeniedException.class,() -> userService.banUser(userForBun));
+    void userWithoutAdminRoleTryToBanUser_ShouldThrowException() {
+        User currentUser = new User(1L, "user", true, "password", "password", "email");
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", true, "password", "password", "email");
+            assertThrows(PermissionForBanAndUnbanUserDeniedException.class, () -> userService.banUser(userForBan));
+        }
     }
 
+    @Test
+    void userWithAdminRoleTryToBanUserThatIsNull_ShouldThrowException() {
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = null;
+            assertThrows(NullPointerException.class, () -> userService.banUser(userForBan));
+        }
+    }
 
-}
+    @Test
+    void userWithAdminRoleTryToBanUserThatIdIsNull_ShouldThrowException() {
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        User userForBan = new User(null, "user", true, "password", "password", "email");
+        assertThrows(NullPointerException.class, () -> userService.banUser(userForBan));
+    }
+    @Test
+    void userWithAdminRoleTryToBanUser_ShouldBanUser() {
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", true, "password", "password", "email");
+            userService.banUser(userForBan);
+            assertEquals(userForBan.getActivity(),false);
+            verify(userRepository).save(userForBan);
+        }
+    }
+
+    @Test
+    void userWithAdminRoleTryToBanAlreadyBannedUser_ShouldThrowException(){
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", false, "password", "password", "email");
+            assertThrows(UserAlreadyBannedException.class, () -> userService.banUser(userForBan));
+        }
+        }
+    @Test
+    void userWithAdminRoleTryToBanAdminUser_ShouldThrowException(){
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", true, "password", "password", "email");
+            userForBan.getRoles().add(Role.ROLE_ADMIN);
+            assertThrows(PermissionForBanAndUnbanUserDeniedException.class, () -> userService.banUser(userForBan));
+        }
+    }
+    }

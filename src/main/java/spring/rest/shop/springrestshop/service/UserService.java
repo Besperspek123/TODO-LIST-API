@@ -169,20 +169,24 @@ public class UserService implements UserDetailsService {
     }
     public void banUser(User userForBan) throws UserAlreadyBannedException {
         User currentUser = SecurityContext.getCurrentUser();
+        if (userForBan == null){
+            throw new NullPointerException("User for ban is null");
+        }
+        if (userForBan.getId() == null){
+            throw new NullPointerException("User id cant be null");
+        }
         if(!userForBan.getActivity()){
             throw new UserAlreadyBannedException("User with username: " + userForBan.getUsername() + "already banned");
         }
-        try {
-            if(currentUser.getRoles().contains(Role.ROLE_ADMIN) && !userForBan.getRoles().contains(Role.ROLE_ADMIN)){
-                userForBan.setActivity(false);
-                userRepository.save(userForBan);
-            }
-            else throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
+        if(!currentUser.getRoles().contains(Role.ROLE_ADMIN)){
+            throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
         }
-        catch (PermissionForBanAndUnbanUserDeniedException e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+        if(userForBan.getRoles().contains(Role.ROLE_ADMIN)){
+            throw new PermissionForBanAndUnbanUserDeniedException("You cant ban the admin");
         }
+
+        userForBan.setActivity(false);
+        userRepository.save(userForBan);
     }
 
     public void unbanUser(User userForUnban) throws UserNotBannedException {

@@ -1,24 +1,30 @@
 package spring.rest.shop.springrestshop.service;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.MockedStatic;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.entity.Cart;
+import spring.rest.shop.springrestshop.entity.Role;
 import spring.rest.shop.springrestshop.entity.User;
-import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
-import spring.rest.shop.springrestshop.exception.UserBannedException;
-import spring.rest.shop.springrestshop.exception.UserNotFoundException;
+import spring.rest.shop.springrestshop.exception.*;
+import spring.rest.shop.springrestshop.repository.CartRepository;
 import spring.rest.shop.springrestshop.repository.UserRepository;
 
 import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.*;
 
 
 @ExtendWith(MockitoExtension.class)
@@ -26,6 +32,8 @@ class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+    @Mock
+    CartRepository cartRepository;
 
     @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -312,5 +320,160 @@ class UserServiceTest {
         User user = new User();
         assertThrows(NullPointerException.class,() -> userService.editUser(user));
     }
+    @Test
+    void giveUserWithEmptyPassword_ShouldReturnUserWithOldPassword() {
+        User user = new User();
+        user.setId(1L);
+        user.setUsername("username");
+        user.setEmail("email");
+        user.setPassword("password");
 
-}
+        User user1 = new User();
+        user1.setId(1L);
+        user1.setUsername("username123");
+        user1.setEmail("email123");
+        user1.setPassword("");
+        user1.setPasswordConfirm("");
+
+        when(userRepository.findById(1L)).thenReturn(user);
+
+        userService.editUser(user1);
+        assertEquals(user1.getPassword(),user.getPassword());
+        verify(userRepository).save(user1);
+
+    }
+
+    @Test
+    void giveCorrectUserAndTryEdit_ShouldReturnEditedUser(){
+        User user1 = new User(1L, "usermame", true, "password", "password", "email");
+        User user2 = new User(1L, "usermame1", false, "password1", "password1", "email1");
+
+        when(userRepository.findById(1L)).thenReturn(user1);
+
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+
+        userService.editUser(user2);
+
+        verify(userRepository).save(userCaptor.capture());
+        User savedUser = userCaptor.getValue();
+
+        assertEquals(user2.getUsername(), savedUser.getUsername());
+        assertEquals(user2.getEmail(), savedUser.getEmail());
+        assertEquals(user2.getPassword(), savedUser.getPassword());
+        assertEquals(userCaptor.getValue().getActivity(), true);
+
+    }
+
+    @Test
+    void givenUserWithDifferentPasswordAndConfirmPassword_ShouldThrowException(){
+        User user = new User(1L,"username",true,"password","password","email");
+        user.setPassword("newpassword");
+        user.setPasswordConfirm("newconfirmpassword");
+
+        when(userRepository.findById(1L)).thenReturn(user);
+
+        assertThrows(UserPasswordAndConfirmPasswordIsDifferentException.class,() -> userService.editUser(user));
+    }
+
+    @Test
+    void givenUserWithEmptyPassword_ShouldReturnException(){
+        User user = new User(null,"username",true,"","password","email");
+        assertThrows(PasswordCantBeEmptyException.class,() -> userService.saveNewUser(user));
+    }
+    @Test
+    void givenUserWithNullPassword_ShouldReturnException(){
+        User user = new User(null,"username",true,null,"password","email");
+        assertThrows(NullPointerException.class,() -> userService.saveNewUser(user));
+    }
+    @Test
+    void givenUserWithNotNullId_ShouldSaveUser(){
+        User user = new User(1L,"username",true,"password","password","email");
+        userService.saveNewUser(user);
+        verify(userRepository).save(user);
+    }
+    @Test
+    void givenUserWithNullId_ShouldSaveUser(){
+        User user = new User(null,"username",true,"password","password","email");
+        userService.saveNewUser(user);
+        verify(userRepository).save(user);
+    }
+    @Test
+    void givenUserWithUsernameAdmin_IfAdminIsExist_ShouldThrowException(){
+        User user = new User(null,"admin",true,"password","password","email");
+        when(userRepository.findByUsernameIgnoreCase("admin")).thenReturn(new User());
+
+        assertThrows(UserAlreadyRegisteredException.class,() -> userService.saveNewUser(user));
+
+    }
+    @Test
+    void givenUserWithUsernameAdmin_IfAdminIsNotExist_ShouldSaveUser(){
+        User user = new User(null,"admin",true,"password","password","email");
+        when(userRepository.findByUsernameIgnoreCase("admin")).thenReturn(null);
+        userService.saveNewUser(user);
+        assertTrue(user.getRoles().contains(Role.ROLE_ADMIN));
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void userWithoutAdminRoleTryToBanUser_ShouldThrowException() {
+        User currentUser = new User(1L, "user", true, "password", "password", "email");
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", true, "password", "password", "email");
+            assertThrows(PermissionForBanAndUnbanUserDeniedException.class, () -> userService.banUser(userForBan));
+        }
+    }
+
+    @Test
+    void userWithAdminRoleTryToBanUserThatIsNull_ShouldThrowException() {
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = null;
+            assertThrows(NullPointerException.class, () -> userService.banUser(userForBan));
+        }
+    }
+
+    @Test
+    void userWithAdminRoleTryToBanUserThatIdIsNull_ShouldThrowException() {
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        User userForBan = new User(null, "user", true, "password", "password", "email");
+        assertThrows(NullPointerException.class, () -> userService.banUser(userForBan));
+    }
+    @Test
+    void userWithAdminRoleTryToBanUser_ShouldBanUser() {
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", true, "password", "password", "email");
+            userService.banUser(userForBan);
+            assertEquals(userForBan.getActivity(),false);
+            verify(userRepository).save(userForBan);
+        }
+    }
+
+    @Test
+    void userWithAdminRoleTryToBanAlreadyBannedUser_ShouldThrowException(){
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", false, "password", "password", "email");
+            assertThrows(UserAlreadyBannedException.class, () -> userService.banUser(userForBan));
+        }
+        }
+    @Test
+    void userWithAdminRoleTryToBanAdminUser_ShouldThrowException(){
+        User currentUser = new User(1L, "admin", true, "password", "password", "email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            User userForBan = new User(2L, "user", true, "password", "password", "email");
+            userForBan.getRoles().add(Role.ROLE_ADMIN);
+            assertThrows(PermissionForBanAndUnbanUserDeniedException.class, () -> userService.banUser(userForBan));
+        }
+    }
+    }

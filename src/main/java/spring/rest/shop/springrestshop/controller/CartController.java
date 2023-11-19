@@ -7,8 +7,10 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import spring.rest.shop.springrestshop.entity.Cart;
+import spring.rest.shop.springrestshop.entity.CartProduct;
 import spring.rest.shop.springrestshop.entity.Product;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
@@ -16,6 +18,9 @@ import spring.rest.shop.springrestshop.service.CartProductService;
 import spring.rest.shop.springrestshop.service.CartService;
 import spring.rest.shop.springrestshop.service.ProductService;
 import spring.rest.shop.springrestshop.service.UserService;
+
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class CartController {
@@ -31,26 +36,19 @@ public class CartController {
     private CartProductService cartProductService;
 
     @PostMapping("/addToCart")
-    public String addProductToCart(@RequestParam("productId") int productId, Model model, Authentication authentication, RedirectAttributes redirectAttributes) throws EntityNotFoundException {
-        User currentUser = userService.findUserByUsername(authentication.getName());
+    public String addProductToCart(@RequestParam("productId") int productId, Model model, Authentication authentication, RedirectAttributes redirectAttributes) {
         Product productForAddToCart = productService.getProductDetails(productId);
 
-
         if (productForAddToCart.getAmountInStore() == 0){
-            redirectAttributes.addAttribute("cartProductError","В магазине нет товара");
+            redirectAttributes.addAttribute("cartProductError","Shop doesn`t have enough amount of products");
             return "redirect:/main";
         }
         if(!cartService.checkAvailability(productForAddToCart)){
-            redirectAttributes.addAttribute("cartProductError","Вы не можете добавить в корзину такое количество" +
-                    "товара, которого нет в магазине");
+            redirectAttributes.addAttribute("cartProductError","Shop doesn`t have enough amount of products");
                     return "redirect:/main";
         }
 
         cartService.addProductToCart(productForAddToCart);
-
-
-
-
 
         return "redirect:/main";
     }
@@ -67,10 +65,33 @@ public class CartController {
         return "cart/details";
     }
 
+    //TODO need to fix bug when you try refuse count of product in cart when your count is 10 you can`t do it because you see exception
+    // that shop doesnt have enough items
+
+    //TODO sometimes i get error filter when i am trying to add count to product in cart
     @PostMapping("/cart/update")
-    public String updateCart(@RequestParam(name = "productId") Integer productId,@RequestParam(name = "quantity") int quantity,Authentication authentication) {
-        Cart cart = userService.findUserByUsername(authentication.getName()).getCart();
-        cartService.updateCartItem(cart, productId, quantity);
-        return "redirect:/cart";
+    @ResponseBody
+    public Map<String, Object> updateCart(@RequestParam(name = "productId") long cartProductID, @RequestParam(name = "quantity") int quantity, Authentication authentication) {
+        Map<String, Object> response = new HashMap<>();
+        CartProduct cartProduct = cartProductService.getById(cartProductID);
+
+        if (cartProduct.getProduct().getAmountInStore() == 0) {
+            response.put("success", false);
+            response.put("message", "Shop doesn't have enough amount of products");
+        } else if (!cartService.checkAvailability(cartProduct.getProduct(),quantity)) {
+            response.put("success", false);
+            response.put("message", "Shop doesn't have enough amount of products");
+        } else if(quantity <= 0){
+            System.out.println(quantity);
+            response.put("success", false);
+            response.put("message", "Quantity cant be 0");
+        }
+        else {
+            cartService.updateCartItem(cartProductID, quantity);
+            response.put("success", true);
+            response.put("message", "Cart updated successfully");
+        }
+
+        return response;
     }
 }

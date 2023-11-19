@@ -7,6 +7,7 @@ import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.shop.ShopDTO;
 import spring.rest.shop.springrestshop.dto.shop.ShopEditDTO;
 import spring.rest.shop.springrestshop.entity.*;
+import spring.rest.shop.springrestshop.exception.EmptyFieldException;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.*;
 
@@ -36,24 +37,40 @@ public class ShopService {
         return shopRepository.getAllByOwnerAndActivityFalse(currentUser);
     }
 
-    public void saveShop(Organization shop){
-        if (shop.getName()!= null) {
-            if (shop.getId() == 0) {
-                shop.setOwner(SecurityContext.getCurrentUser());
-            } else {
-                shop.setOwner(shopRepository.getOrganizationById(shop.getId()).getOwner());
-            }
-
-
-            //TODO need to change in false when be make admin mode
-            //this code move new shop to moderation shop list
-//        if(!owner.getRoles().contains(Role.ROLE_ADMIN)){
+//    public void saveShop(Organization shop){
+//        if (shop.getName()!= null) {
+//            if (shop.getId() == 0) {
+//                shop.setOwner(SecurityContext.getCurrentUser());
+//            } else {
+//                shop.setOwner(shopRepository.getOrganizationById(shop.getId()).getOwner());
+//            }
+//
+//        if(!shop.getOwner().getRoles().contains(Role.ROLE_ADMIN)){
 //            shop.setActivity(false);
 //        }
+//         else {shop.setActivity(true);}
+//         shopRepository.save(shop);
+//        }
+//    }
 
-            shop.setActivity(true);
-            shopRepository.save(shop);
+    public void saveShop(Organization shop){
+        if (shop.getName() == null || shop.getName().isEmpty()){
+            throw new EmptyFieldException("Shop name cant be empty");
         }
+        User currentUser =SecurityContext.getCurrentUser();
+        if (shop.getId() == 0){
+            shop.setOwner(currentUser);
+        }
+        else {
+            shop.setOwner(shopRepository.getOrganizationById(shop.getId()).getOwner());
+        }
+        if(!shop.getOwner().getRoles().contains(Role.ROLE_ADMIN)){
+            shop.setActivity(false);
+        }
+        else {shop.setActivity(true);}
+        shopRepository.save(shop);
+
+
     }
 
     public void editShop(long shopId, ShopEditDTO shopForEdit) throws EntityNotFoundException {

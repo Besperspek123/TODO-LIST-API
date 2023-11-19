@@ -25,15 +25,18 @@ import spring.rest.shop.springrestshop.repository.UserRepository;
 import java.util.List;
 
 @Service
-@RequiredArgsConstructor
 @Slf4j
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
     private final CartRepository cartRepository;
-
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private BCryptPasswordEncoder bCryptPasswordEncoder;
+    public UserService(UserRepository userRepository, CartRepository cartRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+        this.userRepository = userRepository;
+        this.cartRepository = cartRepository;
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+    }
     @Override
     public UserDetails loadUserByUsername(String username) {    
         User user = userRepository.findByUsernameIgnoreCase(username);
@@ -95,10 +98,10 @@ public class UserService implements UserDetailsService {
                 throw new UserAlreadyRegisteredException("Username with this Mail is already registered");
             }
         }
-       if(!givenUser.getPassword().equals(givenUser.getPasswordConfirm())){
-           throw new UserPasswordAndConfirmPasswordIsDifferentException("Your password and confirm password is different");
+        if (!givenUser.getPassword().equals(givenUser.getPasswordConfirm())) {
+            throw new UserPasswordAndConfirmPasswordIsDifferentException("Your password and confirm password are different");
         }
-            if(givenUser.getPassword() == null){
+            if(givenUser.getPassword() == null || givenUser.getPassword().isEmpty()){
                 givenUser.setPassword(userRepository.findById((long) givenUser.getId()).getPassword());
             }
                 else givenUser.setPassword(bCryptPasswordEncoder.encode(givenUser.getPassword()));
@@ -106,11 +109,11 @@ public class UserService implements UserDetailsService {
             givenUser.setActivity(true);
             givenUser.setCart(userRepository.findById((long) givenUser.getId()).getCart());
             givenUser.setPasswordConfirm("");
-
-
-        userRepository.save(givenUser); // сохраняем пользователя
+        userRepository.save(givenUser);
         log.info("Edited User with username: {}", givenUser.getUsername());
     }
+
+    //TODO new write the only one method for edit user. Only one for controller and rest controller
     public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){
             throw new EntityNotFoundException("Username with ID " + userId + " not found");
@@ -137,16 +140,24 @@ public class UserService implements UserDetailsService {
     public void saveNewUser(User user) {
         if(user.getId() == null)
         {
+
+            if(user.getPassword() == null){
+                throw new NullPointerException("Password cant be null");
+            }
             if(user.getPassword().isEmpty()){
                 throw new PasswordCantBeEmptyException("Your password can`t be empty");
             }
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user.setActivity(true);
-            user.getRoles().add(Role.ROLE_USER);
+
+            if(checkIfUserExistsByUsername(user.getUsername())){
+                throw new UserAlreadyRegisteredException("User with this username already registered");
+            }
             if (user.getUsername().equals("admin")){
                 user.getRoles().add(Role.ROLE_ADMIN);
             }
-            Cart cart =new Cart();
+            else user.getRoles().add(Role.ROLE_USER);
+            Cart cart = new Cart();
             cartRepository.save(cart);
             cart.setBuyer(user);
             user.setCart(cart);
@@ -154,24 +165,28 @@ public class UserService implements UserDetailsService {
         }
 
         userRepository.save(user); // сохраняем пользователя
-        log.info("Saving new User with username: {}", user.getUsername());
+        log.info("Saving User with username: {}", user.getUsername());
     }
     public void banUser(User userForBan) throws UserAlreadyBannedException {
         User currentUser = SecurityContext.getCurrentUser();
+        if (userForBan == null){
+            throw new NullPointerException("User for ban is null");
+        }
+        if (userForBan.getId() == null){
+            throw new NullPointerException("User id cant be null");
+        }
         if(!userForBan.getActivity()){
             throw new UserAlreadyBannedException("User with username: " + userForBan.getUsername() + "already banned");
         }
-        try {
-            if(currentUser.getRoles().contains(Role.ROLE_ADMIN) && !userForBan.getRoles().contains(Role.ROLE_ADMIN)){
-                userForBan.setActivity(false);
-                userRepository.save(userForBan);
-            }
-            else throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
+        if(!currentUser.getRoles().contains(Role.ROLE_ADMIN)){
+            throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
         }
-        catch (PermissionForBanAndUnbanUserDeniedException e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
+        if(userForBan.getRoles().contains(Role.ROLE_ADMIN)){
+            throw new PermissionForBanAndUnbanUserDeniedException("You cant ban the admin");
         }
+
+        userForBan.setActivity(false);
+        userRepository.save(userForBan);
     }
 
     public void unbanUser(User userForUnban) throws UserNotBannedException {

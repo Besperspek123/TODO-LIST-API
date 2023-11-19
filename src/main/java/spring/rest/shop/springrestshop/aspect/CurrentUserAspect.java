@@ -45,7 +45,7 @@ public class CurrentUserAspect {
                     if (arg instanceof Model) {
                         ((Model) arg).addAttribute("currentUser", currentUser);
                     }
-                    if (arg instanceof ModelAndView) {
+                    else if (arg instanceof ModelAndView) {
                         ((ModelAndView) arg).addObject("currentUser", currentUser);
                     }
                 }

@@ -1,16 +1,20 @@
 package spring.rest.shop.springrestshop.service;
 
+import org.checkerframework.checker.units.qual.C;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import spring.rest.shop.springrestshop.aspect.SecurityContext;
+import spring.rest.shop.springrestshop.entity.Cart;
+import spring.rest.shop.springrestshop.entity.Role;
 import spring.rest.shop.springrestshop.entity.User;
-import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
-import spring.rest.shop.springrestshop.exception.UserBannedException;
-import spring.rest.shop.springrestshop.exception.UserNotFoundException;
+import spring.rest.shop.springrestshop.exception.*;
+import spring.rest.shop.springrestshop.repository.CartRepository;
 import spring.rest.shop.springrestshop.repository.UserRepository;
 
 import java.util.Arrays;
@@ -27,6 +31,8 @@ class UserServiceTest {
 
     @Mock
     UserRepository userRepository;
+    @Mock
+    CartRepository cartRepository;
 
     @Mock
     BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -338,15 +344,82 @@ class UserServiceTest {
 
     @Test
     void giveCorrectUserAndTryEdit_ShouldReturnEditedUser(){
-        User user1 = new User(1L,"usermame",true,"password","password","email");
-        User user2 = new User(1L,"usermame1",true,"password1","password1","email1");
+        User user1 = new User(1L, "usermame", true, "password", "password", "email");
+        User user2 = new User(1L, "usermame1", false, "password1", "password1", "email1");
 
         when(userRepository.findById(1L)).thenReturn(user1);
-        User user1Copy = new User(1L,"usermame",true,"password","password","email");
-        userService.editUser(user2);
-        verify(userRepository).save(user1Copy); // Проверяем, что сохранен оригинальный user1
-        assertEquals(user1Copy.getUsername(), "usermame1"); // Проверяем, что в копии изменилось имя пользователя
 
+        ArgumentCaptor<User> userCaptor = ArgumentCaptor.forClass(User.class);
+
+        userService.editUser(user2);
+
+        verify(userRepository).save(userCaptor.capture());
+        User savedUser = userCaptor.getValue();
+
+        assertEquals(user2.getUsername(), savedUser.getUsername());
+        assertEquals(user2.getEmail(), savedUser.getEmail());
+        assertEquals(user2.getPassword(), savedUser.getPassword());
+        assertEquals(userCaptor.getValue().getActivity(), true);
+
+    }
+
+    @Test
+    void givenUserWithDifferentPasswordAndConfirmPassword_ShouldThrowException(){
+        User user = new User(1L,"username",true,"password","password","email");
+        user.setPassword("newpassword");
+        user.setPasswordConfirm("newconfirmpassword");
+
+        when(userRepository.findById(1L)).thenReturn(user);
+
+        assertThrows(UserPasswordAndConfirmPasswordIsDifferentException.class,() -> userService.editUser(user));
+    }
+
+    @Test
+    void givenUserWithEmptyPassword_ShouldReturnException(){
+        User user = new User(null,"username",true,"","password","email");
+        assertThrows(PasswordCantBeEmptyException.class,() -> userService.saveNewUser(user));
+    }
+    @Test
+    void givenUserWithNullPassword_ShouldReturnException(){
+        User user = new User(null,"username",true,null,"password","email");
+        assertThrows(NullPointerException.class,() -> userService.saveNewUser(user));
+    }
+    @Test
+    void givenUserWithNotNullId_ShouldSaveUser(){
+        User user = new User(1L,"username",true,"password","password","email");
+        userService.saveNewUser(user);
+        verify(userRepository).save(user);
+    }
+    @Test
+    void givenUserWithNullId_ShouldSaveUser(){
+        User user = new User(null,"username",true,"password","password","email");
+        userService.saveNewUser(user);
+        verify(userRepository).save(user);
+    }
+    @Test
+    void givenUserWithUsernameAdmin_IfAdminIsExist_ShouldThrowException(){
+        User user = new User(null,"admin",true,"password","password","email");
+        when(userRepository.findByUsernameIgnoreCase("admin")).thenReturn(new User());
+
+        assertThrows(UserAlreadyRegisteredException.class,() -> userService.saveNewUser(user));
+
+    }
+    @Test
+    void givenUserWithUsernameAdmin_IfAdminIsNotExist_ShouldSaveUser(){
+        User user = new User(null,"admin",true,"password","password","email");
+        when(userRepository.findByUsernameIgnoreCase("admin")).thenReturn(null);
+        userService.saveNewUser(user);
+        assertTrue(user.getRoles().contains(Role.ROLE_ADMIN));
+        verify(userRepository).save(user);
+    }
+
+    @Test
+    void UserWithoutAdminRoleTryToBunUser_ShouldThrowException(){
+        User currentUser = new User(1L,"admin",true,"password","password","email");
+        currentUser.getRoles().add(Role.ROLE_ADMIN);
+        when(SecurityContext.getCurrentUser()).thenReturn(currentUser);
+        User userForBun = new User(2L,"user",true,"password","password","email");
+        assertThrows(PermissionForBanAndUnbanUserDeniedException.class,() -> userService.banUser(userForBun));
     }
 
 

@@ -109,11 +109,11 @@ public class UserService implements UserDetailsService {
             givenUser.setActivity(true);
             givenUser.setCart(userRepository.findById((long) givenUser.getId()).getCart());
             givenUser.setPasswordConfirm("");
-
-
         userRepository.save(givenUser);
         log.info("Edited User with username: {}", givenUser.getUsername());
     }
+
+    //TODO new write the only one method for edit user. Only one for controller and rest controller
     public void editUser(long userId, UserEditDTO editUser) throws EntityNotFoundException, UserAlreadyRegisteredException {
         if(userRepository.findById(userId) == null){
             throw new EntityNotFoundException("Username with ID " + userId + " not found");
@@ -140,16 +140,24 @@ public class UserService implements UserDetailsService {
     public void saveNewUser(User user) {
         if(user.getId() == null)
         {
+
+            if(user.getPassword() == null){
+                throw new NullPointerException("Password cant be null");
+            }
             if(user.getPassword().isEmpty()){
                 throw new PasswordCantBeEmptyException("Your password can`t be empty");
             }
             user.setPassword(bCryptPasswordEncoder.encode(user.getPassword()));
             user.setActivity(true);
+
+            if(checkIfUserExistsByUsername(user.getUsername())){
+                throw new UserAlreadyRegisteredException("User with this username already registered");
+            }
             if (user.getUsername().equals("admin")){
                 user.getRoles().add(Role.ROLE_ADMIN);
             }
             else user.getRoles().add(Role.ROLE_USER);
-            Cart cart =new Cart();
+            Cart cart = new Cart();
             cartRepository.save(cart);
             cart.setBuyer(user);
             user.setCart(cart);
@@ -157,7 +165,7 @@ public class UserService implements UserDetailsService {
         }
 
         userRepository.save(user); // сохраняем пользователя
-        log.info("Saving new User with username: {}", user.getUsername());
+        log.info("Saving User with username: {}", user.getUsername());
     }
     public void banUser(User userForBan) throws UserAlreadyBannedException {
         User currentUser = SecurityContext.getCurrentUser();

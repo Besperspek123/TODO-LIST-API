@@ -4,6 +4,7 @@ package spring.rest.shop.springrestshop.entity;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -15,37 +16,33 @@ import java.util.*;
 @Table(name = "users")
 @Data
 public class User implements UserDetails {
-
-    public User(Long id, String username, Boolean activity, String password,String passwordConfirm, String email) {
-        this.id = id;
-        this.username = username;
-        this.activity = activity;
-        this.password = password;
-        this.passwordConfirm = passwordConfirm;
-        this.email = email;
-    }
     public User() {
 
     }
+
+    public User(Long id, String password, String email) {
+        this.id = id;
+        this.password = password;
+        this.email = email;
+    }
+
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "username")
-    private String username;
-
-    @JsonIgnore
-    @Column(name = "activity")
-    private Boolean activity;
+    @Column(name = "email")
+    private String email;
 
     @Column(name = "password")
     private String password;
 
+    @OneToMany(mappedBy = "creator")
+    private List<Task> createdTasks;
 
-    @Transient
-    private String passwordConfirm;
+    @OneToMany(mappedBy = "executor")
+    private List<Task> executedTasks;
 
     @JsonIgnore
     @CollectionTable(name = "user_role",joinColumns = @JoinColumn(name = "user_id"))
@@ -53,22 +50,18 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
-    @Column(name = "email")
-    private String email;
-
-    @JsonIgnore
-    @Column(name = "balance")
-    private long Balance;
 
 
-    @Override
-    public String getUsername(){
-        return username;
-    }
+
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return roles;
+    }
+
+    @Override
+    public String getUsername() {
+        return email;
     }
 
     @Override
@@ -88,12 +81,13 @@ public class User implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return activity;
+        return true;
     }
+
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, username, email);
+        return Objects.hash(id,email);
     }
     @Override
     public boolean equals(Object obj) {
@@ -101,17 +95,16 @@ public class User implements UserDetails {
         if (!(obj instanceof User)) return false;
         User user = (User) obj;
         return Objects.equals(id, user.id) &&
-                Objects.equals(username, user.username) &&
                 Objects.equals(email, user.email);
     }
+
     @Override
     public String toString() {
         return "User{" +
                 "id=" + id +
-                ", username='" + username + '\'' +
-                ", activity=" + activity +
+                ", password='" + password + '\'' +
+                ", roles=" + roles +
                 ", email='" + email + '\'' +
-                ", Balance=" + Balance +
                 '}';
     }
 }

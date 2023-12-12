@@ -61,46 +61,12 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf()
-                .disable()
+                .csrf().disable()
                 .authorizeHttpRequests((requests) -> requests
-                        .requestMatchers( "/","/login/**","/registration/**","/api/auth/**").permitAll()
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/v3/api-docs/**", "/", "/api/auth/**", "/swagger-ui/**").permitAll()
                         .anyRequest().authenticated()
                 )
-                .formLogin()
-                .loginPage("/login")
-                .loginProcessingUrl("/login")
-                .failureHandler(customAuthenticationFailureHandler)
-                .successHandler((request, response, authentication) -> {
-                    if (userService.findUserByUsername(authentication.getName()).getRoles().contains(Role.ROLE_ADMIN)) {
-                        response.sendRedirect("/main");
-                    } else {
-                        response.sendRedirect("/main");
-                    }
-                })
-                .permitAll()
-                .and()
-                .exceptionHandling()
-                .authenticationEntryPoint((request, response, authException) -> {
-                    if ("XMLHttpRequest".equals(request.getHeader("X-Requested-With"))) {
-                        response.sendError(HttpStatus.UNAUTHORIZED.value());
-                    } else {
-                        response.sendRedirect("/login");
-                    }
-                })
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    response.setStatus(HttpStatus.FORBIDDEN.value());
-                    response.getWriter().write("DENIED");
-                })
-                .and()
-                .logout()
-                .logoutUrl("/perform_logout").permitAll()
-                .logoutSuccessUrl("/login").and().exceptionHandling()
-                .and()
-                .anonymous().disable()
-                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider),UsernamePasswordAuthenticationFilter.class);
-
+                .addFilterBefore(new JwtTokenFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 

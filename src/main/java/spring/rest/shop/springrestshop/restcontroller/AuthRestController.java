@@ -2,6 +2,7 @@ package spring.rest.shop.springrestshop.restcontroller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,6 +25,7 @@ import spring.rest.shop.springrestshop.service.AuthService;
 @RestController
 @RequestMapping("/api/auth")
 @RequiredArgsConstructor
+@Validated
 @Tag(name = "Authorization", description = "The Authorization API")
 
 public class AuthRestController {
@@ -36,17 +38,17 @@ public class AuthRestController {
 
     @PostMapping("/login")
     @Operation(summary = "Login")
-    public ResponseEntity<JwtResponse> login(@Validated @RequestBody JwtRequest loginRequest) {
+    public ResponseEntity<JwtResponse> login(@RequestBody JwtRequest loginRequest) {
         JwtResponse response = authService.login(loginRequest);
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/register")
     @Operation(summary = "Register")
-    public ResponseEntity<String> register(@Validated @RequestBody SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
-
+    public ResponseEntity<String> register(@Valid @RequestBody SignUpDto user) {
+        System.out.println(user);
         authService.register(user);
 
-        return new ResponseEntity<>("User with nickname: " + user.getUsername() + " has been created", HttpStatus.OK);
+        return new ResponseEntity<>("User with email: " + user.getEmail() + " has been created", HttpStatus.OK);
     }
 }

@@ -32,8 +32,6 @@ public class SwaggerConfig {
                         .contact(new Contact().name("Besperspek123")
                                 .email("Besperspek123@gmail.com")))
                 .servers(List.of(new Server().url("http://localhost:8080")
-                                .description("Dev service"),
-                        new Server().url("http://localhost:8082")
-                                .description("Beta service")));
+                                .description("Dev service")));
     }
 }

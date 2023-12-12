@@ -8,10 +8,11 @@ import spring.rest.shop.springrestshop.dto.auth.SignUpDto;
 import spring.rest.shop.springrestshop.dto.jwt.JwtRequest;
 import spring.rest.shop.springrestshop.dto.jwt.JwtResponse;
 import spring.rest.shop.springrestshop.entity.User;
-import spring.rest.shop.springrestshop.exception.UserAlreadyRegisteredException;
-import spring.rest.shop.springrestshop.exception.UserPasswordAndConfirmPasswordIsDifferentException;
-import spring.rest.shop.springrestshop.exception.UserWithThisMailAlreadyRegisteredException;
+import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtTokenProvider;
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @RequiredArgsConstructor
@@ -38,21 +39,28 @@ public class AuthService {
         return jwtTokenProvider.refreshUserTokens(refreshToken);
     }
 
-    public void register(SignUpDto user) throws UserAlreadyRegisteredException, UserWithThisMailAlreadyRegisteredException, UserPasswordAndConfirmPasswordIsDifferentException {
-        User userForRegistration= new User();
+    public void register(SignUpDto user) {
+        if(user.getEmail() == null || user.getEmail().isEmpty()){
+            throw new EmailIsNullOrEmptyException("Email cant be empty or null");
+        }
+        if(user.getPassword() == null || user.getPassword().isEmpty()){
+            throw new PasswordCantBeEmptyException("Password cant be empty or null");
+        }
 
-        if(userService.checkIfUserExistsByUsername(user.getUsername()))
+        final Pattern emailPattern =
+                Pattern.compile("^[_A-Za-z0-9-\\+]+(\\.[_A-Za-z0-9-]+)*@" +
+                        "[A-Za-z0-9-]+(\\.[A-Za-z0-9]+)*(\\.[A-Za-z]{2,})$");
+        final Matcher matcher = emailPattern.matcher(user.getEmail());
+        if(!matcher.matches()){
+            throw new InvalidEmailFormatException("You try register user with invalid email, try again with correct email");
+        }
+        if(userService.checkIfUserExistsByUsername(user.getEmail()))
         {
-            throw new UserAlreadyRegisteredException("User with username: "+ user.getUsername() +" already registered");
+            throw new UserAlreadyRegisteredException("User with username: "+ user.getEmail() +" already registered");
         }
-        userForRegistration.setUsername(user.getUsername());
-
-
-        if (!user.getPassword().equals(user.getConfirmPassword())){
-            throw new UserPasswordAndConfirmPasswordIsDifferentException("Пароли не совпадают");
-        }
+        User userForRegistration= new User();
+        userForRegistration.setEmail(user.getEmail());
         userForRegistration.setPassword(user.getPassword());
-        userForRegistration.setPasswordConfirm(user.getConfirmPassword());
 
         if(userService.checkIfUserExistsByEmail(user.getEmail())){
             throw new UserWithThisMailAlreadyRegisteredException("User with email: "+ user.getEmail() +" already registered");

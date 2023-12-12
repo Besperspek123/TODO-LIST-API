@@ -3,12 +3,28 @@ package spring.rest.shop.springrestshop.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import spring.rest.shop.springrestshop.dto.task.TaskDTO;
 
 @Data
-@NoArgsConstructor
 @Entity
 @Table(name = "tasks")
 public class Task {
+
+    public Task(){
+    }
+
+    public Task(String title,User creator,TaskState status){
+        this.title = title;
+        this.creator = creator;
+        this.status = status;
+    }
+    public Task(User creator, TaskDTO taskDTO){
+        this.title = taskDTO.getTitle();
+        this.creator = creator;
+        this.executor = executor;
+        this.status = taskDTO.getStatus();
+    }
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")

@@ -1,6 +1,5 @@
 package spring.rest.shop.springrestshop.service;
 
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
@@ -10,15 +9,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
-import spring.rest.shop.springrestshop.aspect.CurrentUserAspect;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.user.UserEditDTO;
-import spring.rest.shop.springrestshop.entity.Cart;
 import spring.rest.shop.springrestshop.entity.Role;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.jwt.JwtEntityFactory;
-import spring.rest.shop.springrestshop.repository.CartRepository;
 import spring.rest.shop.springrestshop.repository.UserRepository;
 
 
@@ -28,13 +24,11 @@ import java.util.List;
 @Slf4j
 public class UserService implements UserDetailsService {
     private final UserRepository userRepository;
-    private final CartRepository cartRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    public UserService(UserRepository userRepository, CartRepository cartRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
+    public UserService(UserRepository userRepository, BCryptPasswordEncoder bCryptPasswordEncoder) {
         this.userRepository = userRepository;
-        this.cartRepository = cartRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
     }
     @Override
@@ -42,9 +36,6 @@ public class UserService implements UserDetailsService {
         User user = userRepository.findByUsernameIgnoreCase(username);
         if (user == null) {
             throw new UserNotFoundException("User not found");
-        }
-        if (!user.getActivity()) {                              
-            throw new UserBannedException("User is banned");
         }
         return JwtEntityFactory.create(user);                   
                                                             
@@ -78,9 +69,6 @@ public class UserService implements UserDetailsService {
         if(user == null){
             throw new UserNotFoundException("User not found");
         }
-        if (!user.getActivity()) {
-            throw new UserBannedException("User is banned");
-        }
         return user;
     }
 
@@ -107,7 +95,6 @@ public class UserService implements UserDetailsService {
                 else givenUser.setPassword(bCryptPasswordEncoder.encode(givenUser.getPassword()));
 
             givenUser.setActivity(true);
-            givenUser.setCart(userRepository.findById((long) givenUser.getId()).getCart());
             givenUser.setPasswordConfirm("");
         userRepository.save(givenUser);
         log.info("Edited User with username: {}", givenUser.getUsername());
@@ -157,67 +144,16 @@ public class UserService implements UserDetailsService {
                 user.getRoles().add(Role.ROLE_ADMIN);
             }
             else user.getRoles().add(Role.ROLE_USER);
-            Cart cart = new Cart();
-            cartRepository.save(cart);
-            cart.setBuyer(user);
-            user.setCart(cart);
             user.setPasswordConfirm("");
         }
 
         userRepository.save(user); // сохраняем пользователя
         log.info("Saving User with username: {}", user.getUsername());
     }
-    public void banUser(User userForBan) throws UserAlreadyBannedException {
-        User currentUser = SecurityContext.getCurrentUser();
-        if (userForBan == null){
-            throw new NullPointerException("User for ban is null");
-        }
-        if (userForBan.getId() == null){
-            throw new NullPointerException("User id cant be null");
-        }
-        if(!userForBan.getActivity()){
-            throw new UserAlreadyBannedException("User with username: " + userForBan.getUsername() + "already banned");
-        }
-        if(!currentUser.getRoles().contains(Role.ROLE_ADMIN)){
-            throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
-        }
-        if(userForBan.getRoles().contains(Role.ROLE_ADMIN)){
-            throw new PermissionForBanAndUnbanUserDeniedException("You cant ban the admin");
-        }
 
-        userForBan.setActivity(false);
-        userRepository.save(userForBan);
-    }
 
-    public void unbanUser(User userForUnban) throws UserNotBannedException {
-        User currentUser = SecurityContext.getCurrentUser();
-        if(userForUnban.getActivity()){
-            throw new UserNotBannedException("User with username: " + userForUnban.getUsername() + "is not banned");
-        }
-        try {
-            if(currentUser.getRoles().contains(Role.ROLE_ADMIN)){
-                userForUnban.setActivity(true);
-                userRepository.save(userForUnban);
-            }
-            else throw new PermissionForBanAndUnbanUserDeniedException("You don`t have permissions for ban/unban users");
-        }
-        catch (PermissionForBanAndUnbanUserDeniedException e){
-            e.printStackTrace();
-            System.out.println(e.getMessage());
-        }
-    }
 
-    public void addBalance(long userId, long deposit) {
-        User user = getUserById(userId);
-        if(!SecurityContext.getCurrentUser().getRoles().contains(Role.ROLE_ADMIN)){
-            throw new AccessDeniedException("You don`t have permission");
-        }
 
-        if(user== null){
-            throw new UsernameNotFoundException("Don`t have user with ID: " + userId);
-        }
-        user.setBalance(user.getBalance() + deposit);
-        userRepository.save(user);
-    }
+
 }
 

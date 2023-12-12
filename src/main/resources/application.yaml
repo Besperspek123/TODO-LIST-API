@@ -3,3 +3,5 @@ security:
     secret: ZGZnaGZnZGhkZmdoZGZnaGRmZ2hkZmdoZGZnaGRmZ2gNCg==
     access: 3600000
     refresh: 2692000000
+
+eate-target: "classpath:db/create.sql"

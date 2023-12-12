@@ -24,12 +24,6 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
     }
     @ExceptionHandler
-    public ResponseEntity<UserIncorrectData> userAlreadyBannedException(UserAlreadyBannedException exception){
-        UserIncorrectData data = new UserIncorrectData();
-        data.setInfo(exception.getMessage());
-        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
-    }
-    @ExceptionHandler
     public ResponseEntity<UserIncorrectData> UserPasswordAndConfirmPasswordIsDifferentException(UserPasswordAndConfirmPasswordIsDifferentException exception){
         UserIncorrectData data = new UserIncorrectData();
         data.setInfo(exception.getMessage());
@@ -41,18 +35,6 @@ public class ExceptionHandlerController {
         data.setInfo(exception.getMessage());
         return new ResponseEntity<>(data, HttpStatus.CONFLICT);
     }
-    @ExceptionHandler
-    public ResponseEntity<UserIncorrectData> userNotBanned(UserNotBannedException exception){
-        UserIncorrectData data = new UserIncorrectData();
-        data.setInfo(exception.getMessage());
-        return new ResponseEntity<>(data, HttpStatus.CONFLICT);
-    }
-    @ExceptionHandler
-    public ResponseEntity<UserIncorrectData> cartEmpty(CartEmptyException exception){
-        UserIncorrectData data = new UserIncorrectData();
-        data.setInfo(exception.getMessage());
-        return new ResponseEntity<>(data, HttpStatus.NO_CONTENT);
-    }
 
     @ExceptionHandler
     public ResponseEntity<String> userTryGetEntityThatDoesNotExist(EntityNotFoundException exception){
@@ -63,16 +45,7 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(exception.getMessage(), HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler
-    public ResponseEntity<String> userTryAddProductInNotHisShop(UnauthorizedShopAccessException exception){
-        return new ResponseEntity<>(exception.getMessage(),HttpStatus.FORBIDDEN);
-    }
 
-    @ExceptionHandler
-    public ResponseEntity<String> userTryEditNotHerProduct(PermissionForSaveThisProductDeniedException exception){
-        return new ResponseEntity<>(exception.getMessage(),HttpStatus.FORBIDDEN);
-
-    }
     @ExceptionHandler
     public ResponseEntity<String> userTryAddReviewInProductWhereDontBuy(AccessDeniedException exception){
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.FORBIDDEN);

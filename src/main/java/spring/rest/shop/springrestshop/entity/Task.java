@@ -5,6 +5,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import spring.rest.shop.springrestshop.dto.task.TaskDTO;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 @Data
 @Entity
 @Table(name = "tasks")
@@ -21,8 +26,6 @@ public class Task {
     public Task(User creator, TaskDTO taskDTO){
         this.title = taskDTO.getTitle();
         this.creator = creator;
-        this.executor = executor;
-        this.status = taskDTO.getStatus();
     }
 
     @Id
@@ -35,10 +38,16 @@ public class Task {
     @ManyToOne
     @JoinColumn(name = "creator_id")
     private User creator;
-    @ManyToOne
-    @JoinColumn(name = "executor_id")
-    private User executor;
+
+    @ManyToMany
+    @JoinTable(
+            name = "task_executor",
+            joinColumns = @JoinColumn(name = "task_id"),
+            inverseJoinColumns = @JoinColumn(name = "executor_id")
+    )
+    private List<User> executors = new ArrayList<>();
 
     @Column(name = "status")
+    @Enumerated(EnumType.STRING)
     private TaskState status;
 }

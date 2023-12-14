@@ -7,6 +7,4 @@ import spring.rest.shop.springrestshop.entity.TaskState;
 @Data
 public class TaskDTO {
     private String title;
-    private TaskState status;
-
 }

@@ -41,7 +41,7 @@ public class User implements UserDetails {
     @OneToMany(mappedBy = "creator")
     private List<Task> createdTasks;
 
-    @OneToMany(mappedBy = "executor")
+    @ManyToMany(mappedBy = "executors")
     private List<Task> executedTasks;
 
     @JsonIgnore

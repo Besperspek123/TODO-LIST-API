@@ -11,6 +11,6 @@ import java.util.List;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Task findById(long id);
     List<Task> findByCreator(User user);
-    List<Task> findByExecutor(User user);
+    List<Task> findByExecutors(User user);
 
 }

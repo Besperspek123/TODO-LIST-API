@@ -55,6 +55,9 @@ public class UserService implements UserDetailsService {
     public User getUserById(long id){
        return userRepository.findById(id);
     }
+    public User getUserByEmail(String email){
+        return userRepository.findByEmailIgnoreCase(email);
+    }
 
     public List<User> getAllUsers(){
         return userRepository.findAllBy();

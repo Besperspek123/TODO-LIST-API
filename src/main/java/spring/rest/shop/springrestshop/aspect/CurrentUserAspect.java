@@ -22,5 +22,15 @@ public class CurrentUserAspect {
         return userRepository.findByEmailIgnoreCase(authentication.getName());
     }
 
+    @Before("execution(* spring.rest.shop.springrestshop.restcontroller.*.*(..))")
+    public void setCurrentUser(JoinPoint joinPoint) {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication != null && authentication.isAuthenticated()) {
+            String username = authentication.getName();
+            User user = userRepository.findByEmailIgnoreCase(username);
+            SecurityContext.setCurrentUser(user);
+        }
+    }
+
 
 }

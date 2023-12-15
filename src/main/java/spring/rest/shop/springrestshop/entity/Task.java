@@ -31,7 +31,7 @@ public class Task {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
-    private int id;
+    private long id;
     @Column(name = "title")
     private String title;
 
@@ -50,4 +50,9 @@ public class Task {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private TaskState status;
+
+    @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    private List<Comment> comments = new ArrayList<>();
+
+
 }

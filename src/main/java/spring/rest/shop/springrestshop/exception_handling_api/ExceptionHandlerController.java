@@ -61,5 +61,10 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.NOT_FOUND);
 
     }
+    @ExceptionHandler
+    public ResponseEntity<String> invalidFieldException(InvalidFieldDataException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.CONFLICT);
+
+    }
 
 }

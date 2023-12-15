@@ -50,6 +50,9 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     private Set<Role> roles = new HashSet<>();
 
+    @OneToMany(mappedBy = "creator")
+    private List<Comment> comments = new ArrayList<>();
+
 
 
 

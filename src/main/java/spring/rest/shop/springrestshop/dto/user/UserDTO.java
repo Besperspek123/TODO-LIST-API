@@ -6,8 +6,15 @@ import lombok.RequiredArgsConstructor;
 import spring.rest.shop.springrestshop.entity.User;
 
 @Data
-@RequiredArgsConstructor
 public class UserDTO {
+
+    public UserDTO(){}
+
+    public UserDTO(User user){
+        this.email = user.getEmail();
+        this.id = user.getId();
+    }
+
     @Schema(description = "ID of the user. Either 'id' or 'email' must be provided, not both.",
             example = "123", required = false)
     private long id;

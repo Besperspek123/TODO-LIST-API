@@ -3,6 +3,7 @@ package spring.rest.shop.springrestshop.entity;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import spring.rest.shop.springrestshop.dto.task.TaskCreateOrEditDTO;
 import spring.rest.shop.springrestshop.dto.task.TaskDTO;
 
 import java.util.ArrayList;
@@ -24,6 +25,11 @@ public class Task {
         this.status = status;
     }
     public Task(User creator, TaskDTO taskDTO){
+        this.title = taskDTO.getTitle();
+        this.creator = creator;
+    }
+
+    public Task(User creator, TaskCreateOrEditDTO taskDTO){
         this.title = taskDTO.getTitle();
         this.creator = creator;
     }

@@ -1,7 +1,7 @@
 security:
   jwt:
     secret: ZGZnaGZnZGhkZmdoZGZnaGRmZ2hkZmdoZGZnaGRmZ2gNCg==
-    access: 3600000
+    access: 3600000000000000000
     refresh: 2692000000
 
 eate-target: "classpath:db/create.sql"

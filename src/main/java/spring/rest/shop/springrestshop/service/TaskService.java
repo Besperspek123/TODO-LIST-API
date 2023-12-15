@@ -2,10 +2,14 @@ package spring.rest.shop.springrestshop.service;
 
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import spring.rest.shop.springrestshop.aspect.SecurityContext;
 import spring.rest.shop.springrestshop.dto.Status.TaskStatusDTO;
+import spring.rest.shop.springrestshop.dto.task.TaskCreateOrEditDTO;
 import spring.rest.shop.springrestshop.dto.task.TaskDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDTO;
 import spring.rest.shop.springrestshop.entity.Comment;
@@ -14,7 +18,6 @@ import spring.rest.shop.springrestshop.entity.TaskState;
 import spring.rest.shop.springrestshop.entity.User;
 import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.repository.TaskRepository;
-import spring.rest.shop.springrestshop.repository.UserRepository;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -33,7 +36,7 @@ public class TaskService {
         this.userService = userService;
         this.commentService = commentService;
     }
-    public void saveTask(TaskDTO taskDTO){
+    public void saveTask(TaskCreateOrEditDTO taskDTO){
         if (taskDTO.getTitle().isEmpty() || taskDTO.getTitle() == null){
             throw new EmptyFieldException("Title cant be empty or null");
         }
@@ -73,7 +76,36 @@ public class TaskService {
         taskRepository.save(task);
     }
 
-    public void editTask(long taskId,TaskDTO taskDTO){
+    public void removeExecutor(long taskId, UserDTO executorDTO){
+        User currentUser = SecurityContext.getCurrentUser();
+        Task task = taskRepository.findById(taskId);
+
+        if(task == null){
+            throw new EntityNotFoundException("Task with this id not found");
+        }
+        if(task.getCreator() != currentUser){
+            throw new AccessDeniedException("You can choose executor into not your task");
+        }
+        User executor = new User();
+        if(executorDTO == null){
+            throw new EmptyFieldException("Executor cant be empty");
+        }
+        if(executorDTO.getEmail() == null){
+            executor = userService.getUserById(executorDTO.getId());
+        }
+        else executor = userService.getUserByEmail(executorDTO.getEmail());
+        if(executor == null){
+            throw new UserNotFoundException("User with these email or id not found");
+        }
+        if(!task.getExecutors().contains(executor)){
+            throw new UserAlreadyHasThisTaskInHisTaskListException("This user is not executor of this task");
+        }
+
+        task.getExecutors().remove(executor);
+        taskRepository.save(task);
+    }
+
+    public void editTask(long taskId,TaskCreateOrEditDTO taskDTO){
         Task task = taskRepository.findById(taskId);
         User currentUser = SecurityContext.getCurrentUser();
         if (task == null){
@@ -116,9 +148,16 @@ public class TaskService {
         else throw new InvalidFieldDataException("You write invalid status. Status can be only WAITING, IN PROCESS or FINISHED");
         taskRepository.save(task);
     }
-    public List<Task> getTasksForCurrentUser (){
-        return null;
+    public Page<TaskDTO> getTasksForCurrentUserWhereUserIsExecutor(Pageable pageable) {
+        User currentUser = SecurityContext.getCurrentUser();
+        return taskRepository.findByExecutors(currentUser, pageable).map(TaskDTO::new);
     }
+
+    public Page<TaskDTO> getTasksForCurrentUserWhereUserIsCreator(Pageable pageable) {
+        User currentUser = SecurityContext.getCurrentUser();
+        return taskRepository.findByCreator(currentUser, pageable).map(TaskDTO::new);
+    }
+
 
     public void deleteTask(long taskId){
         Task task = taskRepository.findById(taskId);
@@ -154,5 +193,13 @@ public class TaskService {
         comment.setTask(task);
 
         commentService.saveComment(comment);
+    }
+
+    public Task getTaskInfoByID(long taskId){
+        return taskRepository.findById(taskId);
+    }
+
+    public Page<TaskDTO> getAllTasks(PageRequest pageRequest) {
+        return taskRepository.findAll(pageRequest).map(TaskDTO::new);
     }
 }

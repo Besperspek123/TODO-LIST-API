@@ -1,7 +1,6 @@
 package spring.rest.shop.springrestshop.dto.user;
 
 import lombok.Data;
-import spring.rest.shop.springrestshop.entity.User;
 
 @Data
 public class UserSignDTO {

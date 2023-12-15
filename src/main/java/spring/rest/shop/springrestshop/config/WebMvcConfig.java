@@ -9,16 +9,11 @@ import org.springframework.web.servlet.config.annotation.*;
 @Import(SecurityConfig.class)
 public class WebMvcConfig implements WebMvcConfigurer {
     @Override
-    public void addViewControllers(ViewControllerRegistry registry) {
-        registry.addViewController("/login").setViewName("login");
-        registry.addViewController("/news").setViewName("news");
-    }
-    @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
         registry.addResourceHandler("/static/**")
-                .addResourceLocations("classpath:/static/"); // Удалите "**" из пути
+                .addResourceLocations("classpath:/static/");
         registry.addResourceHandler("/webjars/**")
-                .addResourceLocations("classpath:/webjars/"); // Удалите "**" из пути
+                .addResourceLocations("classpath:/webjars/");
         registry.addResourceHandler("/images/**")
                 .addResourceLocations("classpath:/images/");
         registry.addResourceHandler("/js/**")

@@ -66,5 +66,11 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.CONFLICT);
 
     }
+    @ExceptionHandler
+    public ResponseEntity<String> nullPointerException(NullPointerException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.CONFLICT);
+
+    }
+
 
 }

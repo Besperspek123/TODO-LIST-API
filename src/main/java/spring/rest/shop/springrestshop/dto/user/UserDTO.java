@@ -2,7 +2,6 @@ package spring.rest.shop.springrestshop.dto.user;
 
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
-import lombok.RequiredArgsConstructor;
 import spring.rest.shop.springrestshop.entity.User;
 
 @Data

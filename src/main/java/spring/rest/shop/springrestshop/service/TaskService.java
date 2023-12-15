@@ -20,7 +20,6 @@ import spring.rest.shop.springrestshop.exception.*;
 import spring.rest.shop.springrestshop.repository.TaskRepository;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Service
 @Slf4j
@@ -37,8 +36,11 @@ public class TaskService {
         this.commentService = commentService;
     }
     public void saveTask(TaskCreateOrEditDTO taskDTO){
-        if (taskDTO.getTitle().isEmpty() || taskDTO.getTitle() == null){
-            throw new EmptyFieldException("Title cant be empty or null");
+        if(taskDTO.getTitle() == null){
+            throw new NullPointerException("title cant be null");
+        }
+        if (taskDTO.getTitle().isEmpty()){
+            throw new EmptyFieldException("Title cant be empty");
         }
         User currentUser = SecurityContext.getCurrentUser();
         Task taskForSave = new Task(currentUser,taskDTO);
@@ -56,7 +58,7 @@ public class TaskService {
             throw new EntityNotFoundException("Task with this id not found");
         }
         if(task.getCreator() != currentUser){
-            throw new AccessDeniedException("You can choose executor into not your task");
+            throw new AccessDeniedException("You cant choose executor into not your task");
         }
         User executor = new User();
         if(executorDTO == null){
@@ -180,9 +182,9 @@ public class TaskService {
         }
         if(!currentUser.equals(task.getCreator()) &&     !task.getExecutors().contains(currentUser)){
             System.out.println(task.getExecutors());
-            throw new AccessDeniedException("You cant write commeint on task where you are not a creator or an executor");
+            throw new AccessDeniedException("You cant write comment on task where you are not a creator or an executor");
         }
-        if (message.isEmpty() || message == null){
+        if (message.isEmpty()){
             throw new EmptyFieldException("Message cant be empty or null");
         }
 

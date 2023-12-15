@@ -1,35 +1,26 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.actuate.autoconfigure.observation.ObservationProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import spring.rest.shop.springrestshop.dto.user.UserDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDetailsDTO;
 import spring.rest.shop.springrestshop.service.UserService;
-
-import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
-@Tag(name = "User",description = "The User API")
+@Hidden
 public class UserRestController {
 
     private final UserService userService;
 
 
-    @GetMapping("/user/{userID}")
-    @Operation(summary = "Get info about User")
+    @GetMapping("/users/{userID}")
     public ResponseEntity<UserDetailsDTO> getInfoAboutUser(@PathVariable long userID){
         return new ResponseEntity<>(new UserDetailsDTO(userService.getUserById(userID)), HttpStatus.OK);
     }

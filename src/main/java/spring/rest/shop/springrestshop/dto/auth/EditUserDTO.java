@@ -6,6 +6,7 @@ import spring.rest.shop.springrestshop.entity.Role;
 import java.util.Set;
 
 @Data
+@Deprecated
 public class EditUserDTO {
     private String username;
     private String email;

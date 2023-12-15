@@ -1,107 +1,86 @@
 package spring.rest.shop.springrestshop.restcontroller;
 
 
-import io.swagger.v3.oas.annotations.Operation;
-import io.swagger.v3.oas.annotations.Parameter;
-import io.swagger.v3.oas.annotations.tags.Tag;
+import io.swagger.v3.oas.annotations.Hidden;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
-import spring.rest.shop.springrestshop.dto.comment.CommentCreateDTO;
-import spring.rest.shop.springrestshop.dto.comment.CommentDTO;
 import spring.rest.shop.springrestshop.dto.Status.TaskStatusDTO;
+import spring.rest.shop.springrestshop.dto.comment.CommentCreateDTO;
 import spring.rest.shop.springrestshop.dto.task.TaskCreateOrEditDTO;
 import spring.rest.shop.springrestshop.dto.task.TaskDTO;
 import spring.rest.shop.springrestshop.dto.task.TaskDetailsDTO;
 import spring.rest.shop.springrestshop.dto.user.UserDTO;
 import spring.rest.shop.springrestshop.service.TaskService;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RestController
 @RequestMapping("/api")
 @AllArgsConstructor
-@Tag(name = "Task", description = "The Task API")
+@Hidden
 public class TaskRestController {
 
     @Autowired
     private final TaskService taskService;
 
-    @PostMapping("/task")
-    @Operation(summary = "create Task")
+    @PostMapping("/tasks")
     public ResponseEntity<String> createTask(@Validated @RequestBody TaskCreateOrEditDTO taskDTO){
         taskService.saveTask(taskDTO);
         return new ResponseEntity<>("Task created", HttpStatus.OK);
     }
 
-    @PostMapping("/executor/{taskID}")
-    @Operation(summary = "Choose executor",
-            description = "Set an executor for a task by providing either the user's ID or email.")
+    @PostMapping("/tasks/executors/{taskID}")
     public ResponseEntity<String> chooseExecutor(
-            @PathVariable
-            @Parameter(description = "ID of the task", required = true) long taskID,
-            @RequestBody
-            @Parameter(description = "User object with either an ID or an email", required = true) UserDTO executor) {
+            @PathVariable long taskID,
+            @RequestBody UserDTO executor) {
         taskService.chooseExecutor(taskID, executor);
         return new ResponseEntity<>("Executor has been set", HttpStatus.OK);
     }
 
-    @DeleteMapping("/executor/{taskID}")
-    @Operation(summary = "Remove executor")
+    @DeleteMapping("/tasks/executors/{taskID}")
     public ResponseEntity<String> removeExecutor(
-            @PathVariable
-            @Parameter(description = "ID of the task", required = true) long taskID,
-            @RequestBody
-            @Parameter(description = "User object with either an ID or an email", required = true) UserDTO executor) {
+            @PathVariable long taskID,
+            @RequestBody UserDTO executor) {
         taskService.removeExecutor(taskID, executor);
         return new ResponseEntity<>("Executor has been removed", HttpStatus.OK);
     }
 
-    @PutMapping("/task/{taskID}")
-    @Operation(summary = "edit Task")
+    @PutMapping("/tasks/{taskID}")
     public ResponseEntity<String> editTask(@Validated @RequestBody TaskCreateOrEditDTO taskDTO, @PathVariable long taskID){
         taskService.editTask(taskID,taskDTO);
         return new ResponseEntity<>("task edited",HttpStatus.OK);
     }
-    @PutMapping("/task/status/{taskId}")
-    @Operation(summary = "swap status")
+    @PutMapping("/tasks/status/{taskId}")
     public ResponseEntity<String> swapStatus(@Validated @RequestBody TaskStatusDTO taskStatusDTO
     , @PathVariable long taskId){
         taskService.swapTaskStatus(taskId,taskStatusDTO);
         return new ResponseEntity<>("Status has been chanded", HttpStatus.OK);
     }
 
-    @DeleteMapping("/task/{taskID}")
-    @Operation(summary = "delete task")
+    @DeleteMapping("/tasks/{taskID}")
     public ResponseEntity<String> deleteTask(@PathVariable long taskID){
         taskService.deleteTask(taskID);
         return new ResponseEntity<>("Task has been deleted",HttpStatus.OK);
     }
 
-    @PostMapping("/task/comment/{taskID}")
-    @Operation(summary = "add comment to task")
+    @PostMapping("/tasks/comment/{taskID}")
     public ResponseEntity<String> addCommentToTask(@PathVariable long taskID,@RequestBody CommentCreateDTO comment){
         taskService.addComment(taskID,comment.getMessage());
         return new ResponseEntity<>("Comment has been added",HttpStatus.OK);
 
     }
 
-    @GetMapping("/task/{taskID}")
-    @Operation(summary = "get info about task")
+    @GetMapping("/tasks/{taskID}")
     public ResponseEntity<TaskDetailsDTO> getInfoAboutTask(@PathVariable long taskID){
 
         return new ResponseEntity<>(new TaskDetailsDTO(taskService.getTaskInfoByID(taskID)),HttpStatus.OK);
     }
 
-    @GetMapping("/task/executor")
-    @Operation(summary = "Get tasks for current user where he is executor with pagination")
+    @GetMapping("/tasks/executor")
     public ResponseEntity<Page<TaskDTO>> getTasksForCurrentUserWhereHeIsExecutor(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
@@ -109,8 +88,7 @@ public class TaskRestController {
         return new ResponseEntity<>(tasksPage, HttpStatus.OK);
     }
 
-    @GetMapping("/task/creator")
-    @Operation(summary = "Get tasks for current user where he is creator with pagination")
+    @GetMapping("/tasks/creator")
     public ResponseEntity<Page<TaskDTO>> getTasksForCurrentUserWhereHeIsCreator(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size) {
@@ -118,8 +96,7 @@ public class TaskRestController {
         return new ResponseEntity<>(tasksPage, HttpStatus.OK);
     }
 
-    @GetMapping("/task/all")
-    @Operation(summary = "Get all tasks for all users with pagination")
+    @GetMapping("/tasks/all")
     public ResponseEntity<Page<TaskDTO>> getAllTasksForAllUsers(
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "10") int size

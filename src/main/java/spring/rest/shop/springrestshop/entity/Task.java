@@ -2,14 +2,11 @@ package spring.rest.shop.springrestshop.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
-import lombok.NoArgsConstructor;
 import spring.rest.shop.springrestshop.dto.task.TaskCreateOrEditDTO;
 import spring.rest.shop.springrestshop.dto.task.TaskDTO;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Data
 @Entity

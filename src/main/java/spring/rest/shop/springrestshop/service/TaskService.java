@@ -46,8 +46,6 @@ public class TaskService {
         Task taskForSave = new Task(currentUser,taskDTO);
         taskForSave.setStatus(TaskState.WAITING);
         taskRepository.save(taskForSave);
-
-
     }
 
     public void chooseExecutor(long taskId, UserDTO executorDTO){
@@ -134,7 +132,10 @@ public class TaskService {
         if (task == null){
             throw new EntityNotFoundException("task not found");
         }
-        if(!currentUser.equals(task.getCreator()) &&     !task.getExecutors().contains(currentUser)){
+        if(taskStatusDTO == null || taskStatusDTO.getStatus() == null || taskStatusDTO.getStatus().isEmpty()){
+            throw new EmptyFieldException("Status cant be empty or null");
+        }
+        if(!currentUser.equals(task.getCreator()) && !task.getExecutors().contains(currentUser)){
             System.out.println(task.getExecutors());
             throw new AccessDeniedException("You cant swap status into task where you are not a creator or an executor");
         }
@@ -180,12 +181,12 @@ public class TaskService {
         if(task == null){
             throw new EntityNotFoundException("Task with this id not found");
         }
+        if(message == null || message.isEmpty() ){
+            throw new EmptyFieldException("Message cant be empty or null");
+        }
         if(!currentUser.equals(task.getCreator()) &&     !task.getExecutors().contains(currentUser)){
             System.out.println(task.getExecutors());
             throw new AccessDeniedException("You cant write comment on task where you are not a creator or an executor");
-        }
-        if (message.isEmpty()){
-            throw new EmptyFieldException("Message cant be empty or null");
         }
 
         Comment comment = new Comment();
@@ -193,12 +194,15 @@ public class TaskService {
         comment.setCreator(currentUser);
         comment.setCreatedAt(LocalDateTime.now());
         comment.setTask(task);
-
         commentService.saveComment(comment);
     }
 
     public Task getTaskInfoByID(long taskId){
-        return taskRepository.findById(taskId);
+        Task task = taskRepository.findById(taskId);
+        if(task == null){
+            throw new EntityNotFoundException("Task with this ID is not found");
+        }
+        return task;
     }
 
     public Page<TaskDTO> getAllTasks(PageRequest pageRequest) {

@@ -71,6 +71,11 @@ public class ExceptionHandlerController {
         return new ResponseEntity<>(exception.getMessage(),HttpStatus.CONFLICT);
 
     }
+    @ExceptionHandler
+    public ResponseEntity<String> emptyFieldException(EmptyFieldException exception){
+        return new ResponseEntity<>(exception.getMessage(),HttpStatus.CONFLICT);
+
+    }
 
 
 }

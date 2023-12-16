@@ -40,7 +40,6 @@ public class JwtTokenFilter extends GenericFilterBean {
                     sendUnauthorizedResponse((HttpServletResponse) servletResponse, "Expired or invalid token");
                 }
             } catch (ExpiredJwtException e) {
-                // Обработка исключения, если токен устарел
                 sendUnauthorizedResponse((HttpServletResponse) servletResponse, "Token expired");
             }
         } else {

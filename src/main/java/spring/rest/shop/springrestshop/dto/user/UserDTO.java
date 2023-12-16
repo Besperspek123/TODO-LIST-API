@@ -15,11 +15,11 @@ public class UserDTO {
     }
 
     @Schema(description = "ID of the user. Either 'id' or 'email' must be provided, not both.",
-            example = "123", required = false)
+            example = "123")
     private long id;
 
     @Schema(description = "Email of the user. Either 'email' or 'id' must be provided, not both.",
-            example = "user@example.com", required = false)
+            example = "user@example.com")
     private String email;
 
 

@@ -7,7 +7,7 @@
 <img src="https://img.shields.io/badge/Engine-Spring%20Boot%203.0.5-blueviolet"></img> 
 <img src="https://img.shields.io/badge/Version-1.0(alpha)-yellow"></img> <img src="https://img.shields.io/badge/License-MIT-Green"></img>
 </div>
-# Техническое Задание
+# Техническое Задание от работодателя 
 
 Вам необходимо разработать простую систему управления задачами (Task
 Management System) с использованием Java. Система должна обеспечивать создание,
@@ -15,6 +15,8 @@ Management System) с использованием Java. Система долж
 заголовок, описание, статус (например, "в ожидании", "в процессе", "завершено") и
 приоритет (например, "высокий", "средний", "низкий"),
 исполнителя. Реализовать необходимо только API.
+
+Подробнее о техническом задание: [Ссылка на ТЗ](https://docs.yandex.ru/docs/view?url=ya-disk-public%3A%2F%2FzSjJn%2BolC8zZAWTbGeRIkTBCYzscJ0AKViVuhL%2FU%2F6kHb7HLtcsOrKwkaYV9B9jHq%2FJ6bpmRyOJonT3VoXnDag%3D%3D%3A%2FТЗ%20джава%20(1).docx&name=ТЗ%20джава%20(1).docx&nosw=1)
 
 ## Запуск Проекта с Использованием Docker
 

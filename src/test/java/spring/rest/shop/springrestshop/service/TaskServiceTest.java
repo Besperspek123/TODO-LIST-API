@@ -17,6 +17,7 @@ import spring.rest.shop.springrestshop.exception.EmptyFieldException;
 import spring.rest.shop.springrestshop.exception.EntityNotFoundException;
 import spring.rest.shop.springrestshop.repository.TaskRepository;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
@@ -121,4 +122,71 @@ class TaskServiceTest {
 
         }
 
+    @Test
+    void UserTryToChooseExecutor_shouldThrowEntityNotFoundException(){
+        when(taskRepository.findById(1L)).thenReturn(null);
+        assertThrows(EntityNotFoundException.class,() -> taskService.chooseExecutor(1L,new UserDTO()));
+    }
+    @Test
+    void UserTryToChooseExecutor_shouldThrowAccessDeniedException(){
+        User currentUser = new User(1L,"password","email");
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            when(taskRepository.findById(1L)).thenReturn(new Task());
+            assertThrows(AccessDeniedException.class, () -> taskService.chooseExecutor(1L, new UserDTO()));
+        }
+        }
+
+    @Test
+    void UserTryToChooseExecutor_shouldThrowEmptyFieldException(){
+        User currentUser = new User(1L,"password","email");
+        Task task = new Task();
+        task.setCreator(currentUser);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            when(taskRepository.findById(1L)).thenReturn(task);
+            assertThrows(EmptyFieldException.class, () -> taskService.chooseExecutor(1L, null));
+        }
+    }
+    @Test
+    void UserTryToChooseExecutor_shouldChooseExecutorByEmail(){
+        User currentUser = new User(1L,"password","email");
+        Task task = new Task();
+        task.setCreator(currentUser);
+        task.setTitle("title");
+        task.setDescription("description");
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+        userDTO.setEmail("emailDTO");
+        task.setCreator(currentUser);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            when(taskRepository.findById(1L)).thenReturn(task);
+            when(userService.getUserByEmail("emailDTO")).thenReturn(currentUser);
+            taskService.chooseExecutor(1L,userDTO);
+            assertEquals(task.getExecutors().get(0),currentUser);
+            verify(taskRepository).save(task);
+        }
+    }
+
+    @Test
+    void UserTryToChooseExecutor_shouldChooseExecutorById(){
+        User currentUser = new User(1L,"password","mail");
+        Task task = new Task();
+        task.setCreator(currentUser);
+        task.setTitle("title");
+        task.setDescription("description");
+        UserDTO userDTO = new UserDTO();
+        userDTO.setId(1L);
+        userDTO.setEmail(null);
+        task.setCreator(currentUser);
+        try (MockedStatic<SecurityContext> mocked = mockStatic(SecurityContext.class)) {
+            mocked.when(SecurityContext::getCurrentUser).thenReturn(currentUser);
+            when(taskRepository.findById(1L)).thenReturn(task);
+            when(userService.getUserById(userDTO.getId())).thenReturn(currentUser);
+            taskService.chooseExecutor(1L,userDTO);
+            assertEquals(task.getExecutors().get(0),currentUser);
+            verify(taskRepository).save(task);
+        }
+    }
     }

@@ -28,6 +28,7 @@ public class Task {
 
     public Task(User creator, TaskCreateOrEditDTO taskDTO){
         this.title = taskDTO.getTitle();
+        this.description = taskDTO.getDescription();
         this.creator = creator;
     }
 
@@ -37,6 +38,9 @@ public class Task {
     private long id;
     @Column(name = "title")
     private String title;
+
+    @Column(name = "description")
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "creator_id")

@@ -5,6 +5,7 @@ import lombok.Data;
 @Data
 public class TaskCreateOrEditDTO {
     private String title;
+    public String description;
 
     public TaskCreateOrEditDTO(){
 

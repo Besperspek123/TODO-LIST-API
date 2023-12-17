@@ -42,6 +42,7 @@ public class TaskService {
         if (taskDTO.getTitle().isEmpty()){
             throw new EmptyFieldException("Title cant be empty");
         }
+
         User currentUser = SecurityContext.getCurrentUser();
         Task taskForSave = new Task(currentUser,taskDTO);
         taskForSave.setStatus(TaskState.WAITING);
@@ -62,9 +63,9 @@ public class TaskService {
         if(executorDTO == null){
             throw new EmptyFieldException("Executor cant be empty");
         }
-        if(executorDTO.getEmail() == null){
-            executor = userService.getUserById(executorDTO.getId());
-        }
+        if(executorDTO.getEmail() == null ) {
+                executor = userService.getUserById(executorDTO.getId());
+            }
         else executor = userService.getUserByEmail(executorDTO.getEmail());
         if(task.getExecutors().contains(executor)){
             throw new UserAlreadyHasThisTaskInHisTaskListException("This executor already exist in this task");
@@ -119,8 +120,11 @@ public class TaskService {
 
         }
 
-        if(taskDTO.getTitle() != null){
+        if(taskDTO.getTitle() != null && !taskDTO.getTitle().isEmpty()){
             task.setTitle(taskDTO.getTitle());
+        }
+        if(taskDTO.getDescription() != null && !taskDTO.getDescription().isEmpty()){
+            task.setDescription(taskDTO.getDescription());
         }
         taskRepository.save(task);
 

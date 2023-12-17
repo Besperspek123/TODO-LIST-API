@@ -264,6 +264,9 @@ components:
                 title:
                     type: string
                     description: The title of the task
+                description:
+                    type: string
+                    description: The description of the task
         UserDTO:
             type: object
             properties:
@@ -300,21 +303,25 @@ components:
         TaskDetailsDTO:
             type: object
             properties:
+                title:
+                    type: string
+                    description: The title of the task
+                description:
+                    type: string
+                    description: The description of the task
+                status:
+                    $ref: '#/components/schemas/TaskState'
+                comments:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/CommentDTO'
                 creator:
                     $ref: '#/components/schemas/UserDTO'
                 executors:
                     type: array
                     items:
                         $ref: '#/components/schemas/UserDTO'
-                comments:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/CommentDTO'
-                title:
-                    type: string
-                    description: The title of the task
-                status:
-                    $ref: '#/components/schemas/TaskState'
+
         TaskDTO:
             type: object
             properties:
